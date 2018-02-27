@@ -1,0 +1,92 @@
+<html>
+<head>
+    <title>$action.getText("ru.mail.jira.plugins.projectconfigurator.configuration")</title>
+    <meta name="decorator" content="atl.admin" />
+    $webResourceManager.requireResource( "ru.mail.jira.plugins.projectconfigurator:project-configurator-configuration-resources" )
+</head>
+<body class="aui">
+    #set ( $hasConfiguration = $action.getWorkflows().size() > 0 && $action.getIssueTypes().size() > 0 && $action.getScreenSchemes().size() > 0 && $action.getPermissionSchemes().size() > 0)
+    <header class="aui-page-header">
+        <div class="aui-page-header-inner">
+            <div class="aui-page-header-main">
+                <h2>$action.getText( "ru.mail.jira.plugins.projectconfigurator.configuration" )</h2>
+            </div>
+            #if ($hasConfiguration)
+                <div class="aui-page-header-actions">
+                    <div class="aui-buttons">
+                        <a class="aui-button" href="${action.contextPath}/secure/admin/ProjectConfiguratorConfigurationDelete!default.jspa">$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.delete" )</a>
+                    </div>
+                    <div class="aui-buttons">
+                        <a class="aui-button" href="${action.contextPath}/secure/admin/ProjectConfiguratorConfigurationEdit!default.jspa">$i18n.getText( "admin.common.phrases.edit.configuration" )</a>
+                    </div>
+                </div>
+            #else
+                <div class="aui-page-header-actions">
+                    <div class="aui-buttons">
+                        <a class="aui-button" href="${action.contextPath}/secure/admin/ProjectConfiguratorConfigurationEdit!default.jspa" title="$i18n.getText( "common.words.configure" )">$i18n.getText( "common.words.configure" )</a>
+                    </div>
+                </div>
+            #end
+        </div>
+    </header>
+    #if ( $hasConfiguration )
+    <table class="aui">
+        <caption>$i18n.getText( "admin.menu.general.settings" )</caption>
+        <tbody>
+            <tr>
+                <td width="40%">
+                    <b>Workflows</b>
+                </td>
+                <td width="60%">
+                    #foreach($workflow in $action.getWorkflows())
+                        <div>$workflow.name</div>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td width="40%">
+                    <b>Issue Types</b>
+                </td>
+                <td width="60%">
+                    #foreach($issueType in $action.getIssueTypes())
+                        <div>$issueType.name</div>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td width="40%">
+                    <b>Field Screen Schemes</b>
+                </td>
+                <td width="60%">
+                    #foreach($screenScheme in $action.getScreenSchemes())
+                        <div>$screenScheme.name</div>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td width="40%">
+                    <b>Permission Schemes</b>
+                </td>
+                <td width="60%">
+                    #foreach($permissionScheme in $action.getPermissionSchemes())
+                        <div>$permissionScheme.name</div>
+                    #end
+                </td>
+            </tr>
+            <tr>
+                <td width="40%">
+                    <b>Notification Schemes</b>
+                </td>
+                <td width="60%">
+                    #foreach($notificationScheme in $action.getNotificationSchemes())
+                        <div>$notificationScheme.name</div>
+                    #end
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    #else
+        <div>$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.empty" )</div>
+    #end
+</body>
+</html>

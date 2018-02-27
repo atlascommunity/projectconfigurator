@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.delete" )</title>
+        <meta name="decorator" content="atl.admin" />
+        <meta name="admin.active.section" content="admin_project_menu/project-configurator-configuration-section"/>
+        <meta name="admin.active.tab" content="project-configurator-configuration-link"/>
+    </head>
+    <body class="aui">
+        <header class="aui-page-header">
+            <div class="aui-page-header-inner">
+                <div class="aui-page-header-main">
+                    <h2>$action.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.delete" )</h2>
+                </div>
+            </div>
+        </header>
+        <form action="${action.actionName}.jspa" class="aui" method="post">
+            <div>
+                $action.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.delete.confirm" )
+                <div class="hidden">
+                    <input name="atl_token" type="hidden" value="$action.xsrfToken">
+                </div>
+            </div>
+            <div class="buttons-container">
+                <div class="buttons">
+                    <input accesskey="s" class="aui-button" name="Update" title="$i18n.getText( "common.forms.confirm" )" type="submit" value="$i18n.getText( "common.forms.confirm" )">
+                    <a accesskey="`" class="aui-button aui-button-link cancel" href="${action.contextPath}/secure/admin/ProjectConfiguratorConfiguration.jspa" title="$i18n.getText( "common.words.cancel" )">$i18n.getText( "common.words.cancel" )</a>
+                </div>
+            </div>
+        </form>
+    </body>
+</html>

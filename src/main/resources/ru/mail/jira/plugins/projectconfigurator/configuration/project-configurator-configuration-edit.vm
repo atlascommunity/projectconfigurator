@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <title>$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration" )</title>
+        <meta name="decorator" content="atl.admin" />
+        <meta name="admin.active.section" content="admin_project_menu/project-configurator-configuration-section"/>
+        <meta name="admin.active.tab" content="project-configurator-configuration-link"/>
+        $webResourceManager.requireResource( "ru.mail.jira.plugins.projectconfigurator:project-configurator-configuration-resources" )
+    </head>
+    <body class="aui">
+        <header class="aui-page-header">
+            <div class="aui-page-header-inner">
+                <div class="aui-page-header-main">
+                    <h2>$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration" )</h2>
+                </div>
+            </div>
+        </header>
+        #macro( fieldError $name )
+            #if( $action.hasErrors && $action.errors.get( $name ) )
+            <div class="error">$action.errors.get( $name )</div>
+            #end
+        #end
+        #macro( select $array $value )
+            #foreach( $item in $array )
+                #if ( $item.id == $value || $item.name == $value )
+                    selected
+                #end
+            #end
+        #end
+        <form action="${action.actionName}.jspa" method="post" class="aui">
+            <input id="project-configurator-workflows" class="hidden" name="workflowNames" value="$action.workflowNames">
+            <input id="project-configurator-issue-types" class="hidden" name="issueTypeIds" value="$action.issueTypeIds">
+            <input id="project-configurator-screen-schemes" class="hidden" name="screenSchemeIds" value="$action.screenSchemeIds">
+            <input id="project-configurator-permission-schemes" class="hidden" name="permissionSchemeIds" value="$action.permissionSchemeIds">
+            <input id="project-configurator-notification-schemes" class="hidden" name="notificationSchemeIds" value="$action.notificationSchemeIds">
+            <div class="field-group">
+                <label for="project-configurator-workflows">Workflows<span class="aui-icon icon-required"></span></label>
+                <select class="select long-field project-configurator-workflows" name="project-configurator-workflows" type="text" multiple="true">
+                    #foreach( $workflow in $action.getAllWorkflows() )
+                        <option value="$workflow.name" #select( $action.getWorkflows() $workflow.name )>$workflow.name</option>
+                    #end
+                </select>
+                #fieldError( "project-configurator-workflows" )
+            </div>
+            <div class="field-group">
+                <label for="project-configurator-issue-types">Issue Types<span class="aui-icon icon-required"></span></label>
+                <select class="select long-field project-configurator-issue-types" name="project-configurator-issue-types" type="text" multiple="true">
+                    #foreach( $issueType in $action.getAllIssueTypes() )
+                        <option value="$issueType.id" #select( $action.getIssueTypes() $issueType.id )>$issueType.name</option>
+                    #end
+                </select>
+                #fieldError( "project-configurator-issue-types" )
+            </div>
+            <div class="field-group">
+                <label for="project-configurator-screen-schemes">Field Screen Schemes<span class="aui-icon icon-required"></span></label>
+                <select class="select long-field project-configurator-screen-schemes" name="project-configurator-screen-schemes" type="text" multiple="true">
+                    #foreach( $screenScheme in $action.getAllScreenSchemes() )
+                        <option value="$screenScheme.id" #select( $action.getScreenSchemes() $screenScheme.id )>$screenScheme.name</option>
+                    #end
+                </select>
+                #fieldError( "project-configurator-screen-schemes" )
+            </div>
+            <div class="field-group">
+                <label for="project-configurator-permission-schemes">Permission Schemes<span class="aui-icon icon-required"></span></label>
+                <select class="select long-field project-configurator-permission-schemes" name="project-configurator-permission-schemes" type="text" multiple="true">
+                    #foreach( $permissionScheme in $action.getAllPermissionSchemes() )
+                        <option value="$permissionScheme.id" #select( $action.getPermissionSchemes() $permissionScheme.id )>$permissionScheme.name</option>
+                    #end
+                </select>
+                #fieldError( "project-configurator-permission-schemes" )
+            </div>
+            <div class="field-group">
+                <label for="project-configurator-notification-schemes">Notification Schemes<span class="aui-icon icon-required"></span></label>
+                <select class="select long-field project-configurator-notification-schemes" name="project-configurator-notification-schemes" type="text" multiple="true">
+                    #foreach( $notificationScheme in $action.getAllNotificationSchemes() )
+                        <option value="$notificationScheme.id" #select( $action.getNotificationSchemes() $notificationScheme.id )>$notificationScheme.name</option>
+                    #end
+                </select>
+                #fieldError( "project-configurator-notification-schemes" )
+            </div>
+            <div class="buttons-container">
+                <div class="buttons">
+                    <input type="submit" class="button aui-button" title="$i18n.getText("common.words.save")" value="$i18n.getText("common.words.save")" />
+                    <a accesskey="`" class="aui-button aui-button-link cancel" href="${action.contextPath}/secure/admin/ProjectConfiguratorConfiguration.jspa" title="$i18n.getText( "common.words.cancel" )">$i18n.getText( "common.words.cancel" )</a>
+                </div>
+            </div>
+        </form>
+    </body>
+</html>

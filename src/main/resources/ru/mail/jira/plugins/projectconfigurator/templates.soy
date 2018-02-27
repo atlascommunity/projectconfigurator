@@ -1,0 +1,22 @@
+{namespace JIRA.Templates.Plugins.ProjectConfigurator}
+
+/**
+ * Process Type entry
+ * @param processType processType
+ */
+{template .processTypeEntry autoescape="false"}
+    <tr class="project-configurator-process-type-row">
+        <td class="project-configurator-process-workflow" data-id="{$processType.workflow.id}">{$processType.workflow.name}</td>
+        <td class="project-configurator-process-type-description">{$processType.description}</td>
+        <td class="project-configurator-process-type-issue-types">
+            {foreach $issueType in $processType.issueTypes}
+                <div data-id="{$issueType.id}">{$issueType.name}</div>
+            {/foreach}
+        </td>
+        <td>
+            <ul class="operations-list">
+                <li><a href="#" class="project-configurator-process-type-delete">Delete</a></li>
+            </ul>
+        </td>
+    </tr>
+{/template}

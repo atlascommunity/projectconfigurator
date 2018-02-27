@@ -1,0 +1,69 @@
+#if ( $value )
+    <div class="aui-tabs horizontal-tabs">
+        <ul class="tabs-menu">
+            <li class="menu-item active-tab">
+                <a href="#project-configuration-general">General</a>
+            </li>
+            <li class="menu-item">
+                <a href="#project-configuration-processes">Processes</a>
+            </li>
+            <li class="menu-item">
+                <a href="#project-configuration-roles">Roles</a>
+            </li>
+        </ul>
+        <div class="tabs-pane active-pane" id="project-configuration-general">
+            <div style=" margin-top: 10px;">
+                <dl>
+                    <dt style="color: #707070;">Project:</dt>
+                    <dd>$value.projectName ($value.projectKey)</dd>
+                    <dt style="color: #707070;">Permission Scheme:</dt>
+                    <dd>$value.permissionScheme.name</dd>
+                    <dt style="color: #707070;">Notification Scheme:</dt>
+                    <dd>$value.notificationScheme.name</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="tabs-pane" id="project-configuration-processes">
+            <table class="aui">
+                <thead>
+                    <tr>
+                        <th id="issueType">Issue Type</th>
+                        <th id="workflow">Workflow</th>
+                        <th id="screenScheme">Screen Scheme</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #foreach($issueType in $value.issueTypes.entrySet())
+                        <tr>
+                            <td headers="issueType">$issueType.key.name</td>
+                            <td headers="workflow">$issueType.value.name</td>
+                            <td class="screenScheme">$value.screenSchemes.get($issueType.key).name</td>
+                        </tr>
+                    #end
+                </tbody>
+            </table>
+        </div>
+        <div class="tabs-pane" id="project-configuration-roles">
+            <table class="aui">
+                <thead>
+                <tr>
+                    <th id="role">Role</th>
+                    <th id="users">Users</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #foreach($role in $value.roles.entrySet())
+                    <tr>
+                        <td headers="role">$role.key.name</td>
+                        <td headers="users">
+                            #foreach($user in $role.value)
+                                <div>$user.displayName</div>
+                            #end
+                        </td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+        </div>
+    </div>
+#end
