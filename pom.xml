@@ -71,6 +71,25 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>ru.mail.jira.plugins</groupId>
+                <artifactId>i18-js-generator-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <charset>UTF-8</charset>
+                    <i18nFile>src/main/resources/ru/mail/jira/plugins/projectconfigurator/projectconfigurator.properties</i18nFile>
+                    <output>src/main/resources/ru/mail/jira/plugins/projectconfigurator/i18n/project-configurator-i18n.js</output>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-js-i18n</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate-js-i18n</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-jira-plugin</artifactId>
                 <version>${amps.version}</version>
@@ -78,22 +97,78 @@
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
+                    <systemPropertyVariables>
+                        <fastdev.mvn.command>${fastdev.mvn.command}</fastdev.mvn.command>
+                        <enableDevToolbox>false</enableDevToolbox>
+                        <enablePde>false</enablePde>
+                        <skipRestDocGeneration>true</skipRestDocGeneration>
+                        <allowGoogleTracking>false</allowGoogleTracking>
+                        <skipManifestValidation>true</skipManifestValidation>
+                        <extractDependencies>false</extractDependencies>
+                    </systemPropertyVariables>
+                    <compressJs>false</compressJs>
+                    <fastdevVersion>1.9</fastdevVersion>
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>l10n-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <locales>
+                        <locale>ru</locale>
+                        <locale>en</locale>
+                    </locales>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <excludes>
+                        <exclude>**/client/**</exclude>
+                    </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <id>exec-npm-install</id>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <workingDirectory>client</workingDirectory>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>install</argument>
+                            </arguments>
+                            <skip>true</skip>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>exec-npm-build</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <workingDirectory>client</workingDirectory>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>prod-jira</argument>
+                            </arguments>
+                            <skip>false</skip>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -102,6 +177,7 @@
         <jira.version>7.6.3</jira.version>
         <amps.version>6.3.14</amps.version>
         <useFastdevCli>false</useFastdevCli>
+        <fastdev.mvn.command>/Applications/Atlassian/atlassian-plugin-sdk-5.1.10/apache-maven-3.2.1/bin//mvn</fastdev.mvn.command>
     </properties>
 
 </project>
