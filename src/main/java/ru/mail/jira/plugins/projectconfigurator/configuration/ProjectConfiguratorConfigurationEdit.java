@@ -1,14 +1,18 @@
 package ru.mail.jira.plugins.projectconfigurator.configuration;
 
+import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.screen.FieldScreenScheme;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.notification.NotificationScheme;
 import com.atlassian.jira.permission.PermissionScheme;
+import com.atlassian.jira.project.Project;
 import com.atlassian.jira.scheme.Scheme;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.jira.workflow.JiraWorkflow;
 import org.apache.commons.lang3.StringUtils;
 import ru.mail.jira.plugins.commons.CommonUtils;
+import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfigurationCFType;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +23,11 @@ public class ProjectConfiguratorConfigurationEdit extends JiraWebActionSupport {
     private List<String> screenSchemeIds;
     private List<String> permissionSchemeIds;
     private List<String> notificationSchemeIds;
+    private String adminUserKey;
+
+    private String projectId;
+    private String issueTypeId;
+    private String projectConfigurationCfId;
 
     private final PluginData pluginData;
     private final ProjectConfiguratorManager projectConfiguratorManager;
@@ -31,15 +40,27 @@ public class ProjectConfiguratorConfigurationEdit extends JiraWebActionSupport {
     @Override
     public void doValidation() {
         if (workflowNames == null || workflowNames.size() == 0)
-            addError("project-configurator-workflows", getText("issue.field.required", "Workflows"));
+            addError("project-configurator-workflows", getText("issue.field.required", getText("admin.systeminfo.workflows")));
         if (issueTypeIds == null || issueTypeIds.size() == 0)
-            addError("project-configurator-issue-types", getText("issue.field.required", "Issue Types"));
+            addError("project-configurator-issue-types", getText("issue.field.required", getText("admin.systeminfo.issuetypes")));
         if (screenSchemeIds == null || screenSchemeIds.size() == 0)
-            addError("project-configurator-screen-schemes", getText("issue.field.required", "Field Screen Schemes"));
+            addError("project-configurator-screen-schemes", getText("issue.field.required", getText("admin.systeminfo.screensschemes")));
         if (permissionSchemeIds == null || permissionSchemeIds.size() == 0)
-            addError("project-configurator-permission-schemes", getText("issue.field.required", "Permission Schemes"));
+            addError("project-configurator-permission-schemes", getText("issue.field.required", getText("admin.systeminfo.permissionschemes")));
         if (notificationSchemeIds == null || notificationSchemeIds.size() == 0)
-            addError("project-configurator-notification-schemes", getText("issue.field.required", "Notification Schemes"));
+            addError("project-configurator-notification-schemes", getText("issue.field.required", getText("admin.schemes.notifications.notification.schemes")));
+        if (adminUserKey == null)
+            addError("project-configurator-admin-user", getText("issue.field.required", getText("ru.mail.jira.plugins.projectconfigurator.configuration.adminUser")));
+
+        if (projectId == null)
+            addError("project-configurator-project", getText("issue.field.required", getText("common.words.project")));
+        if (issueTypeId == null)
+            addError("project-configurator-issue-type", getText("issue.field.required", getText("issue.field.issuetype")));
+        if (projectConfigurationCfId == null)
+            addError("project-configurator-field", getText("issue.field.required", getText("ru.mail.jira.plugins.projectconfigurator.field")));
+        else if (!(projectConfiguratorManager.getCustomField(projectConfigurationCfId).getCustomFieldType() instanceof ProjectConfigurationCFType)) {
+            addError("project-configurator-field", getText("ru.mail.jira.plugins.projectconfigurator.field.error.type"));
+        }
     }
 
     @Override
@@ -49,6 +70,12 @@ public class ProjectConfiguratorConfigurationEdit extends JiraWebActionSupport {
         screenSchemeIds = pluginData.getScreenSchemeIds();
         permissionSchemeIds = pluginData.getPermissionSchemeIds();
         notificationSchemeIds = pluginData.getNotificationSchemeIds();
+        adminUserKey = pluginData.getAdminUserKey();
+
+        projectId = pluginData.getProjectId();
+        issueTypeId = pluginData.getIssueTypeId();
+        projectConfigurationCfId = pluginData.getProjectConfigurationCfId();
+
         return INPUT;
     }
 
@@ -59,6 +86,12 @@ public class ProjectConfiguratorConfigurationEdit extends JiraWebActionSupport {
         pluginData.setScreenSchemeIds(screenSchemeIds);
         pluginData.setPermissionSchemeIds(permissionSchemeIds);
         pluginData.setNotificationSchemeIds(notificationSchemeIds);
+        pluginData.setAdminUserKey(adminUserKey);
+
+        pluginData.setProjectId(projectId);
+        pluginData.setIssueTypeId(issueTypeId);
+        pluginData.setProjectConfigurationCfId(projectConfigurationCfId);
+
         return getRedirect("/secure/admin/ProjectConfiguratorConfiguration.jspa");
     }
 
@@ -113,6 +146,46 @@ public class ProjectConfiguratorConfigurationEdit extends JiraWebActionSupport {
     }
 
     @SuppressWarnings("unused")
+    public String getAdminUserKey() {
+        return this.adminUserKey != null ? this.adminUserKey : "";
+    }
+
+    @SuppressWarnings("unused")
+    public void setAdminUserKey(String adminUserKey) {
+        this.adminUserKey = StringUtils.isBlank(adminUserKey) ? null : adminUserKey;
+    }
+
+    @SuppressWarnings("unused")
+    public String getProjectId() {
+        return this.projectId != null ? this.projectId : "";
+    }
+
+    @SuppressWarnings("unused")
+    public void setProjectId(String projectId) {
+        this.projectId = StringUtils.isBlank(projectId) ? null : projectId;
+    }
+
+    @SuppressWarnings("unused")
+    public String getIssueTypeId() {
+        return this.issueTypeId != null ? this.issueTypeId : "";
+    }
+
+    @SuppressWarnings("unused")
+    public void setIssueTypeId(String issueTypeId) {
+        this.issueTypeId = StringUtils.isBlank(issueTypeId) ? null : issueTypeId;
+    }
+
+    @SuppressWarnings("unused")
+    public String getProjectConfigurationCfId() {
+        return this.projectConfigurationCfId != null ? this.projectConfigurationCfId : "";
+    }
+
+    @SuppressWarnings("unused")
+    public void setProjectConfigurationCfId(String projectConfigurationCfId) {
+        this.projectConfigurationCfId = StringUtils.isBlank(projectConfigurationCfId) ? null : projectConfigurationCfId;
+    }
+
+    @SuppressWarnings("unused")
     public List<JiraWorkflow> getWorkflows() {
         return projectConfiguratorManager.getWorkflows(this.workflowNames);
     }
@@ -138,6 +211,26 @@ public class ProjectConfiguratorConfigurationEdit extends JiraWebActionSupport {
     }
 
     @SuppressWarnings("unused")
+    public ApplicationUser getAdminUser() {
+        return this.adminUserKey != null ? projectConfiguratorManager.getUser(adminUserKey) : null;
+    }
+
+    @SuppressWarnings("unused")
+    public Project getProject() {
+        return this.projectId != null ? projectConfiguratorManager.getProject(this.projectId) : null;
+    }
+
+    @SuppressWarnings("unused")
+    public IssueType getIssueType() {
+        return this.issueTypeId != null ? projectConfiguratorManager.getIssueType(this.issueTypeId) : null;
+    }
+
+    @SuppressWarnings("unused")
+    public CustomField getProjectConfigurationCf() {
+        return this.projectConfigurationCfId != null ? projectConfiguratorManager.getCustomField(this.projectConfigurationCfId) : null;
+    }
+
+    @SuppressWarnings("unused")
     public Collection<JiraWorkflow> getAllWorkflows() {
         return projectConfiguratorManager.getAllWorkflows();
     }
@@ -160,6 +253,21 @@ public class ProjectConfiguratorConfigurationEdit extends JiraWebActionSupport {
     @SuppressWarnings("unused")
     public Collection<Scheme> getAllNotificationSchemes() {
         return projectConfiguratorManager.getAllNotificationSchemes();
+    }
+
+    @SuppressWarnings("unused")
+    public Collection<ApplicationUser> getAllAdminUsers() {
+        return projectConfiguratorManager.getAllAdminUsers();
+    }
+
+    @SuppressWarnings("unused")
+    public Collection<Project> getAllProjects() {
+        return projectConfiguratorManager.getAllProjects();
+    }
+
+    @SuppressWarnings("unused")
+    public Collection<CustomField> getAllCustomFields() {
+        return projectConfiguratorManager.getAllCustomFields();
     }
 
     @SuppressWarnings("unused")

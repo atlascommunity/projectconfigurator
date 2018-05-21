@@ -17,4 +17,16 @@ public interface PluginData {
 
     List<String> getNotificationSchemeIds();
     void setNotificationSchemeIds(List<String> notificationSchemeIds);
+
+    String getAdminUserKey();
+    void setAdminUserKey(String adminUserKey);
+
+    String getProjectId();
+    void setProjectId(String projectId);
+
+    String getIssueTypeId();
+    void setIssueTypeId(String issueTypeId);
+
+    String getProjectConfigurationCfId();
+    void setProjectConfigurationCfId(String projectConfigurationCfId);
 }

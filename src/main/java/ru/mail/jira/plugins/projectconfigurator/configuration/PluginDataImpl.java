@@ -11,6 +11,11 @@ public class PluginDataImpl implements PluginData {
     private static final String SCREEN_SCHEME_IDS = PLUGIN_PREFIX + "screenSchemeIds";
     private static final String PERMISSION_SCHEME_IDS = PLUGIN_PREFIX + "permissionSchemeIds";
     private static final String NOTIFICATION_SCHEME_IDS = PLUGIN_PREFIX + "notificationSchemeIds";
+    private static final String ADMIN_USER_KEY = PLUGIN_PREFIX + "adminUserKey";
+
+    private static final String PROJECT_ID = PLUGIN_PREFIX + "projectId";
+    private static final String ISSUE_TYPE_ID = PLUGIN_PREFIX + "issueTypeId";
+    private static final String PROJECT_CONFIGURATION_CF_ID = PLUGIN_PREFIX + "projectConfigurationCfId";
 
     private final PluginSettingsFactory pluginSettingsFactory;
 
@@ -66,5 +71,45 @@ public class PluginDataImpl implements PluginData {
     @Override
     public void setNotificationSchemeIds(List<String> notificationSchemeIds) {
         pluginSettingsFactory.createGlobalSettings().put(NOTIFICATION_SCHEME_IDS, notificationSchemeIds);
+    }
+
+    @Override
+    public String getAdminUserKey() {
+        return (String) pluginSettingsFactory.createGlobalSettings().get(ADMIN_USER_KEY);
+    }
+
+    @Override
+    public void setAdminUserKey(String adminUserKey) {
+        pluginSettingsFactory.createGlobalSettings().put(ADMIN_USER_KEY, adminUserKey);
+    }
+
+    @Override
+    public String getProjectId() {
+        return (String) pluginSettingsFactory.createGlobalSettings().get(PROJECT_ID);
+    }
+
+    @Override
+    public void setProjectId(String projectId) {
+        pluginSettingsFactory.createGlobalSettings().put(PROJECT_ID, projectId);
+    }
+
+    @Override
+    public String getIssueTypeId() {
+        return (String) pluginSettingsFactory.createGlobalSettings().get(ISSUE_TYPE_ID);
+    }
+
+    @Override
+    public void setIssueTypeId(String issueTypeId) {
+        pluginSettingsFactory.createGlobalSettings().put(ISSUE_TYPE_ID, issueTypeId);
+    }
+
+    @Override
+    public String getProjectConfigurationCfId() {
+        return (String) pluginSettingsFactory.createGlobalSettings().get(PROJECT_CONFIGURATION_CF_ID);
+    }
+
+    @Override
+    public void setProjectConfigurationCfId(String projectConfigurationCfId) {
+        pluginSettingsFactory.createGlobalSettings().put(PROJECT_CONFIGURATION_CF_ID, projectConfigurationCfId);
     }
 }

@@ -43,8 +43,10 @@
 
     <web-resource key="project-configurator-bundle-resource">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <resource type="download" name="app.bundle.js" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/app.bundle.js" />
-        <resource type="download" name="app.bundle.js.map" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/app.bundle.js.map" />
+        <dependency>com.atlassian.jira.plugins.jira-workflow-designer:workflow-designer-read-only</dependency>
+        <dependency>ru.mail.jira.plugins.projectconfigurator:project-configurator-i18n-resource</dependency>
+        <resource type="download" name="projectConfigurator.js" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/projectConfigurator.js" />
+        <resource type="download" name="projectConfigurator.js.map" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/projectConfigurator.js.map" />
     </web-resource>
 
     <webwork1 key="project-configurator-configuration" class="java.lang.Object" roles-required="admin">
@@ -106,20 +108,14 @@
         <resource type="velocity" name="view"><![CDATA[Create Project]]></resource>
     </workflow-function>
 
-    <web-section key="project-configuration-menu-section" name="Project Configuration Menu Section" location="project-configuration-menu-link"/>
-
-    <web-item key="project-configuration-menu-link" name="Link on Project Configuration Menu Section" section="system.top.navigation.bar" weight="200">
-        <label key="ru.mail.jira.plugins.projectconfigurator" />
-        <link linkId="project-configuration-menu-link">/projectConfigurator</link>
-        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
-            <param name="permission">use</param>
-        </condition>
-    </web-item>
-
-    <web-item key="project-configuration-menu-web-item" name="Configure Project" section="project-configuration-menu-link/project-configuration-menu-section">
-        <description key="ru.mail.jira.plugins.projectconfigurator.configure" />
-        <label key="ru.mail.jira.plugins.projectconfigurator.configure" />
-        <link linkId="negotiation-issue-menu-web-item">/projectConfigurator</link>
+    <web-item key="project-configuration-menu-link" name="Project Configuration Link" section="system.top.navigation.bar" weight="200">
+        <conditions type="AND">
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
+            <condition class="ru.mail.jira.plugins.projectconfigurator.configurator.ProjectConfiguratorCondition" />
+        </conditions>
+        <label key="ru.mail.jira.plugins.projectconfigurator"/>
+        <tooltip key="ru.mail.jira.plugins.projectconfigurator"/>
+        <link linkId="project-configurator-link">/projectConfigurator</link>
     </web-item>
     
 </atlassian-plugin>

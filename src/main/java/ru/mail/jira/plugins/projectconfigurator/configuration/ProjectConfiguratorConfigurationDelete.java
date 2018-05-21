@@ -21,6 +21,11 @@ public class ProjectConfiguratorConfigurationDelete extends JiraWebActionSupport
         pluginData.setScreenSchemeIds(null);
         pluginData.setPermissionSchemeIds(null);
         pluginData.setNotificationSchemeIds(null);
+        pluginData.setAdminUserKey(null);
+
+        pluginData.setProjectId(null);
+        pluginData.setIssueTypeId(null);
+        pluginData.setProjectConfigurationCfId(null);
 
         return getRedirect("/secure/admin/ProjectConfiguratorConfiguration.jspa");
     }

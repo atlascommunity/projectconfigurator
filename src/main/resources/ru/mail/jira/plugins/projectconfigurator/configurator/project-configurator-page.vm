@@ -7,6 +7,6 @@
     $webResourceManager.requireResource( "ru.mail.jira.plugins.projectconfigurator:project-configurator-bundle-resource" )
 </head>
 <body>
-<div id="root" class="project-configurator-container"></div>
+    <div class="project-configurator-container"></div>
 </body>
 </html>

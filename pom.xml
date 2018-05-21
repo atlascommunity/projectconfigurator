@@ -97,78 +97,61 @@
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
+                    <jvmArgs>-Duser.timezone=GMT+3 -Xmx2g</jvmArgs>
                     <systemPropertyVariables>
+                        <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
                         <fastdev.mvn.command>${fastdev.mvn.command}</fastdev.mvn.command>
-                        <enableDevToolbox>false</enableDevToolbox>
-                        <enablePde>false</enablePde>
-                        <skipRestDocGeneration>true</skipRestDocGeneration>
-                        <allowGoogleTracking>false</allowGoogleTracking>
-                        <skipManifestValidation>true</skipManifestValidation>
-                        <extractDependencies>false</extractDependencies>
                     </systemPropertyVariables>
+
                     <compressJs>false</compressJs>
-                    <fastdevVersion>1.9</fastdevVersion>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>l10n-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
-                <configuration>
-                    <locales>
-                        <locale>ru</locale>
-                        <locale>en</locale>
-                    </locales>
+                    <compressCss>false</compressCss>
+                    <enableFastdev>false</enableFastdev>
+                    <enableDevToolbox>false</enableDevToolbox>
+                    <enablePde>false</enablePde>
+                    <skipRestDocGeneration>true</skipRestDocGeneration>
+                    <allowGoogleTracking>false</allowGoogleTracking>
+                    <skipManifestValidation>true</skipManifestValidation>
+                    <extractDependencies>false</extractDependencies>
+
+                    <pluginArtifacts>
+                        <pluginArtifact>
+                            <groupId>com.atlassian.labs.plugins</groupId>
+                            <artifactId>quickreload</artifactId>
+                            <version>${quick.reload.version}</version>
+                        </pluginArtifact>
+                    </pluginArtifacts>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <excludes>
-                        <exclude>**/client/**</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.4.0</version>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
+                <version>1.5.1</version>
                 <executions>
                     <execution>
-                        <id>exec-npm-install</id>
-                        <phase>initialize</phase>
-                        <configuration>
-                            <workingDirectory>client</workingDirectory>
-                            <executable>npm</executable>
-                            <arguments>
-                                <argument>install</argument>
-                            </arguments>
-                            <skip>true</skip>
-                        </configuration>
                         <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>exec-npm-build</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <workingDirectory>client</workingDirectory>
-                            <executable>npm</executable>
-                            <arguments>
-                                <argument>run</argument>
-                                <argument>prod-jira</argument>
-                            </arguments>
-                            <skip>false</skip>
-                        </configuration>
-                        <goals>
-                            <goal>exec</goal>
+                            <goal>compress</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <!-- Everything on one line -->
+                    <linebreakpos>-1</linebreakpos>
+                    <!-- Don't really care about warning messages. They're fairly useless -->
+                    <jswarn>false</jswarn>
+                    <excludes>
+                        <exclude>**/js/*</exclude>
+                        <exclude>**/react/*</exclude>
+                        <exclude>**/*.xml</exclude>
+                        <exclude>**/*-min*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -176,8 +159,10 @@
     <properties>
         <jira.version>7.6.3</jira.version>
         <amps.version>6.3.14</amps.version>
+        <quick.reload.version>2.0.0</quick.reload.version>
+        <fastdev.mvn.command>/Applications/Atlassian/atlassian-plugin-sdk-6.2.14/apache-maven-3.2.1/bin/mvn</fastdev.mvn.command>
         <useFastdevCli>false</useFastdevCli>
-        <fastdev.mvn.command>/Applications/Atlassian/atlassian-plugin-sdk-5.1.10/apache-maven-3.2.1/bin//mvn</fastdev.mvn.command>
+        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
     </properties>
 
 </project>

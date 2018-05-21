@@ -1,9 +1,12 @@
 package ru.mail.jira.plugins.projectconfigurator.configuration;
 
+import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.screen.FieldScreenScheme;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.notification.NotificationScheme;
 import com.atlassian.jira.permission.PermissionScheme;
+import com.atlassian.jira.project.Project;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.jira.workflow.JiraWorkflow;
 
@@ -15,6 +18,11 @@ public class ProjectConfiguratorConfiguration extends JiraWebActionSupport {
     private List<String> screenSchemeIds;
     private List<String> permissionSchemeIds;
     private List<String> notificationSchemeIds;
+    private String adminUserKey;
+
+    private String projectId;
+    private String issueTypeId;
+    private String projectConfigurationCfId;
 
     private final PluginData pluginData;
     private final ProjectConfiguratorManager projectConfiguratorManager;
@@ -31,6 +39,12 @@ public class ProjectConfiguratorConfiguration extends JiraWebActionSupport {
         screenSchemeIds = pluginData.getScreenSchemeIds();
         permissionSchemeIds = pluginData.getPermissionSchemeIds();
         notificationSchemeIds = pluginData.getNotificationSchemeIds();
+        adminUserKey = pluginData.getAdminUserKey();
+
+        projectId = pluginData.getProjectId();
+        issueTypeId = pluginData.getIssueTypeId();
+        projectConfigurationCfId = pluginData.getProjectConfigurationCfId();
+
         return SUCCESS;
     }
 
@@ -60,7 +74,27 @@ public class ProjectConfiguratorConfiguration extends JiraWebActionSupport {
     }
 
     @SuppressWarnings("unused")
+    public ApplicationUser getAdminUser() {
+        return projectConfiguratorManager.getUser(this.adminUserKey);
+    }
+
+    @SuppressWarnings("unused")
     public String getContextPath() {
         return getHttpRequest().getContextPath();
+    }
+
+    @SuppressWarnings("unused")
+    public Project getProject() {
+        return projectConfiguratorManager.getProject(this.projectId);
+    }
+
+    @SuppressWarnings("unused")
+    public IssueType getIssueType() {
+        return projectConfiguratorManager.getIssueType(this.issueTypeId);
+    }
+
+    @SuppressWarnings("unused")
+    public CustomField getProjectConfigurationCf() {
+        return projectConfiguratorManager.getCustomField(this.projectConfigurationCfId);
     }
 }

@@ -5,7 +5,7 @@
     $webResourceManager.requireResource( "ru.mail.jira.plugins.projectconfigurator:project-configurator-configuration-resources" )
 </head>
 <body class="aui">
-    #set ( $hasConfiguration = $action.getWorkflows().size() > 0 && $action.getIssueTypes().size() > 0 && $action.getScreenSchemes().size() > 0 && $action.getPermissionSchemes().size() > 0)
+    #set ( $hasConfiguration = $action.getWorkflows().size() > 0 && $action.getIssueTypes().size() > 0 && $action.getScreenSchemes().size() > 0 && $action.getPermissionSchemes().size() > 0 && $action.getAdminUser() && $action.getProject() && $action.getIssueType() && $action.getProjectConfigurationCf())
     <header class="aui-page-header">
         <div class="aui-page-header-inner">
             <div class="aui-page-header-main">
@@ -30,61 +30,100 @@
         </div>
     </header>
     #if ( $hasConfiguration )
-    <table class="aui">
-        <caption>$i18n.getText( "admin.menu.general.settings" )</caption>
-        <tbody>
-            <tr>
-                <td width="40%">
-                    <b>Workflows</b>
-                </td>
-                <td width="60%">
-                    #foreach($workflow in $action.getWorkflows())
-                        <div>$workflow.name</div>
-                    #end
-                </td>
-            </tr>
-            <tr>
-                <td width="40%">
-                    <b>Issue Types</b>
-                </td>
-                <td width="60%">
-                    #foreach($issueType in $action.getIssueTypes())
-                        <div>$issueType.name</div>
-                    #end
-                </td>
-            </tr>
-            <tr>
-                <td width="40%">
-                    <b>Field Screen Schemes</b>
-                </td>
-                <td width="60%">
-                    #foreach($screenScheme in $action.getScreenSchemes())
-                        <div>$screenScheme.name</div>
-                    #end
-                </td>
-            </tr>
-            <tr>
-                <td width="40%">
-                    <b>Permission Schemes</b>
-                </td>
-                <td width="60%">
-                    #foreach($permissionScheme in $action.getPermissionSchemes())
-                        <div>$permissionScheme.name</div>
-                    #end
-                </td>
-            </tr>
-            <tr>
-                <td width="40%">
-                    <b>Notification Schemes</b>
-                </td>
-                <td width="60%">
-                    #foreach($notificationScheme in $action.getNotificationSchemes())
-                        <div>$notificationScheme.name</div>
-                    #end
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <table class="aui">
+            <caption>$i18n.getText( "admin.menu.general.settings" )</caption>
+            <tbody>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "admin.systeminfo.workflows" )</b>
+                    </td>
+                    <td width="60%">
+                        #foreach($workflow in $action.getWorkflows())
+                            <div>$workflow.name</div>
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "admin.systeminfo.issuetypes" )</b>
+                    </td>
+                    <td width="60%">
+                        #foreach($issueType in $action.getIssueTypes())
+                            <div>$issueType.name</div>
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "admin.systeminfo.screensschemes" )</b>
+                    </td>
+                    <td width="60%">
+                        #foreach($screenScheme in $action.getScreenSchemes())
+                            <div>$screenScheme.name</div>
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "admin.systeminfo.permissionschemes" )</b>
+                    </td>
+                    <td width="60%">
+                        #foreach($permissionScheme in $action.getPermissionSchemes())
+                            <div>$permissionScheme.name</div>
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "admin.schemes.notifications.notification.schemes" )</b>
+                    </td>
+                    <td width="60%">
+                        #foreach($notificationScheme in $action.getNotificationSchemes())
+                            <div>$notificationScheme.name</div>
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.adminUser" )</b>
+                    </td>
+                    <td width="60%">
+                        <div>
+                            <a class="user-hover" rel="$action.getAdminUser().key" href="/jira/secure/ViewProfile.jspa?name=$action.getAdminUser().name">$action.getAdminUser().displayName</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="aui">
+            <caption>$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.task" )</caption>
+            <tbody>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "common.words.project" )</b>
+                    </td>
+                    <td width="60%">
+                        <div>$action.getProject().name ($action.getProject().key)</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "issue.field.issuetype" )</b>
+                    </td>
+                    <td width="60%">
+                        <div>$action.getIssueType().name</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="40%">
+                        <b>$action.getText( "ru.mail.jira.plugins.projectconfigurator.field" )</b>
+                    </td>
+                    <td width="60%">
+                        <div>$action.getProjectConfigurationCf().name</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     #else
         <div>$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.empty" )</div>
     #end

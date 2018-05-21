@@ -32,51 +32,103 @@
             <input id="project-configurator-screen-schemes" class="hidden" name="screenSchemeIds" value="$action.screenSchemeIds">
             <input id="project-configurator-permission-schemes" class="hidden" name="permissionSchemeIds" value="$action.permissionSchemeIds">
             <input id="project-configurator-notification-schemes" class="hidden" name="notificationSchemeIds" value="$action.notificationSchemeIds">
-            <div class="field-group">
-                <label for="project-configurator-workflows">Workflows<span class="aui-icon icon-required"></span></label>
-                <select class="select long-field project-configurator-workflows" name="project-configurator-workflows" type="text" multiple="true">
-                    #foreach( $workflow in $action.getAllWorkflows() )
-                        <option value="$workflow.name" #select( $action.getWorkflows() $workflow.name )>$workflow.name</option>
-                    #end
-                </select>
-                #fieldError( "project-configurator-workflows" )
-            </div>
-            <div class="field-group">
-                <label for="project-configurator-issue-types">Issue Types<span class="aui-icon icon-required"></span></label>
-                <select class="select long-field project-configurator-issue-types" name="project-configurator-issue-types" type="text" multiple="true">
-                    #foreach( $issueType in $action.getAllIssueTypes() )
-                        <option value="$issueType.id" #select( $action.getIssueTypes() $issueType.id )>$issueType.name</option>
-                    #end
-                </select>
-                #fieldError( "project-configurator-issue-types" )
-            </div>
-            <div class="field-group">
-                <label for="project-configurator-screen-schemes">Field Screen Schemes<span class="aui-icon icon-required"></span></label>
-                <select class="select long-field project-configurator-screen-schemes" name="project-configurator-screen-schemes" type="text" multiple="true">
-                    #foreach( $screenScheme in $action.getAllScreenSchemes() )
-                        <option value="$screenScheme.id" #select( $action.getScreenSchemes() $screenScheme.id )>$screenScheme.name</option>
-                    #end
-                </select>
-                #fieldError( "project-configurator-screen-schemes" )
-            </div>
-            <div class="field-group">
-                <label for="project-configurator-permission-schemes">Permission Schemes<span class="aui-icon icon-required"></span></label>
-                <select class="select long-field project-configurator-permission-schemes" name="project-configurator-permission-schemes" type="text" multiple="true">
-                    #foreach( $permissionScheme in $action.getAllPermissionSchemes() )
-                        <option value="$permissionScheme.id" #select( $action.getPermissionSchemes() $permissionScheme.id )>$permissionScheme.name</option>
-                    #end
-                </select>
-                #fieldError( "project-configurator-permission-schemes" )
-            </div>
-            <div class="field-group">
-                <label for="project-configurator-notification-schemes">Notification Schemes<span class="aui-icon icon-required"></span></label>
-                <select class="select long-field project-configurator-notification-schemes" name="project-configurator-notification-schemes" type="text" multiple="true">
-                    #foreach( $notificationScheme in $action.getAllNotificationSchemes() )
-                        <option value="$notificationScheme.id" #select( $action.getNotificationSchemes() $notificationScheme.id )>$notificationScheme.name</option>
-                    #end
-                </select>
-                #fieldError( "project-configurator-notification-schemes" )
-            </div>
+            <input id="project-configurator-admin-user" class="hidden" name="adminUserKey" value="$action.adminUserKey">
+            <input id="project-configurator-project" class="hidden" name="projectId" value="$action.projectId">
+            <input id="project-configurator-issue-type" class="hidden" name="issueTypeId" value="$action.issueTypeId">
+            <input id="project-configurator-field" class="hidden" name="projectConfigurationCfId" value="$action.projectConfigurationCfId">
+            <h3>$action.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.settings" )</h3>
+            <fieldset>
+                <legend>$action.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.settings" )</legend>
+                <div class="field-group">
+                    <label for="project-configurator-workflows">$action.getText( "admin.systeminfo.workflows" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-workflows" name="project-configurator-workflows" type="text" multiple="true">
+                        #foreach( $workflow in $action.getAllWorkflows() )
+                            <option value="$workflow.name" #select( $action.getWorkflows() $workflow.name )>$workflow.name</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-workflows" )
+                </div>
+                <div class="field-group">
+                    <label for="project-configurator-issue-types">$action.getText( "admin.systeminfo.issuetypes" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-issue-types" name="project-configurator-issue-types" type="text" multiple="true">
+                        #foreach( $issueType in $action.getAllIssueTypes() )
+                            <option value="$issueType.id" #select( $action.getIssueTypes() $issueType.id )>$issueType.name</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-issue-types" )
+                </div>
+                <div class="field-group">
+                    <label for="project-configurator-screen-schemes">$action.getText( "admin.systeminfo.screensschemes" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-screen-schemes" name="project-configurator-screen-schemes" type="text" multiple="true">
+                        #foreach( $screenScheme in $action.getAllScreenSchemes() )
+                            <option value="$screenScheme.id" #select( $action.getScreenSchemes() $screenScheme.id )>$screenScheme.name</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-screen-schemes" )
+                </div>
+                <div class="field-group">
+                    <label for="project-configurator-permission-schemes">$action.getText( "admin.systeminfo.permissionschemes" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-permission-schemes" name="project-configurator-permission-schemes" type="text" multiple="true">
+                        #foreach( $permissionScheme in $action.getAllPermissionSchemes() )
+                            <option value="$permissionScheme.id" #select( $action.getPermissionSchemes() $permissionScheme.id )>$permissionScheme.name</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-permission-schemes" )
+                </div>
+                <div class="field-group">
+                    <label for="project-configurator-notification-schemes">$action.getText( "admin.schemes.notifications.notification.schemes" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-notification-schemes" name="project-configurator-notification-schemes" type="text" multiple="true">
+                        #foreach( $notificationScheme in $action.getAllNotificationSchemes() )
+                            <option value="$notificationScheme.id" #select( $action.getNotificationSchemes() $notificationScheme.id )>$notificationScheme.name</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-notification-schemes" )
+                </div>
+                <div class="field-group">
+                    <label for="project-configurator-admin-user">$action.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.adminUser" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-admin-user" name="project-configurator-notification-schemes" type="text">
+                        <option></option>
+                        #foreach( $user in $action.getAllAdminUsers() )
+                            <option value="$user.key" #select( [$action.getAdminUser()] $user.name )>$user.displayName</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-admin-user" )
+                </div>
+            </fieldset>
+            <h3>$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.task" )</h3>
+            <fieldset>
+                <legend>$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.configuration.task" )</legend>
+                <div class="field-group">
+                    <label for="project-configurator-project">$action.getText( "common.words.project" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-project" name="project-configurator-project" type="text">
+                        <option></option>
+                        #foreach( $project in $action.getAllProjects() )
+                            <option value="$project.id" #select( [$action.getProject()] $project.id )>$project.name ($project.key)</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-project" )
+                </div>
+                <div class="field-group">
+                    <label for="project-configurator-issue-type">$action.getText( "issue.field.issuetype" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-issue-type" name="project-configurator-issue-type" type="text">
+                        <option></option>
+                        #foreach( $issueType in $action.getAllIssueTypes() )
+                            <option value="$issueType.id" #select( [$action.getIssueType()] $issueType.id )>$issueType.name</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-issue-type" )
+                </div>
+                <div class="field-group">
+                    <label for="project-configurator-field">$action.getText( "ru.mail.jira.plugins.projectconfigurator.field" )<span class="aui-icon icon-required"></span></label>
+                    <select class="select long-field project-configurator-field" name="project-configurator-field" type="text">
+                        <option></option>
+                        #foreach( $customField in $action.getAllCustomFields() )
+                            <option value="$customField.id" #select( [$action.getProjectConfigurationCf()] $customField.id )>$customField.name</option>
+                        #end
+                    </select>
+                    #fieldError( "project-configurator-field" )
+                </div>
+            </fieldset>
             <div class="buttons-container">
                 <div class="buttons">
                     <input type="submit" class="button aui-button" title="$i18n.getText("common.words.save")" value="$i18n.getText("common.words.save")" />

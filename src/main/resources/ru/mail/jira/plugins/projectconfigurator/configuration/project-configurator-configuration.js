@@ -20,6 +20,22 @@
             placeholder: "Select a notification schemes",
             allowClear: true
         });
+        $(".project-configurator-admin-user").auiSelect2({
+            placeholder: "Select a admin user",
+            allowClear: true
+        });
+        $(".project-configurator-project").auiSelect2({
+            placeholder: "Select a project",
+            allowClear: true
+        });
+        $(".project-configurator-issue-type").auiSelect2({
+            placeholder: "Select an issue type",
+            allowClear: true
+        });
+        $(".project-configurator-field").auiSelect2({
+            placeholder: "Select a project configuration field",
+            allowClear: true
+        });
     });
 
     $(document).on('change', '.project-configurator-workflows', function() {
@@ -45,5 +61,25 @@
     $(document).on('change', '.project-configurator-notification-schemes', function() {
         var fieldValue = $(this).auiSelect2('data');
         $('#project-configurator-notification-schemes').attr('value', fieldValue.length > 0 ? fieldValue.map(function(item) { return item.id }) : '');
+    });
+
+    $(document).on('change', '.project-configurator-admin-user', function() {
+        var fieldValue = $(this).auiSelect2('data');
+        $('#project-configurator-admin-user').attr('value', fieldValue != null ? fieldValue.id : null);
+    });
+
+    $(document).on('change', '.project-configurator-project', function() {
+        var fieldValue = $(this).auiSelect2('data');
+        $('#project-configurator-project').attr('value', fieldValue != null ? fieldValue.id : null);
+    });
+
+    $(document).on('change', '.project-configurator-issue-type', function() {
+        var fieldValue = $(this).auiSelect2('data');
+        $('#project-configurator-issue-type').attr('value', fieldValue != null ? fieldValue.id : null);
+    });
+
+    $(document).on('change', '.project-configurator-field', function() {
+        var fieldValue = $(this).auiSelect2('data');
+        $('#project-configurator-field').attr('value', fieldValue != null ? fieldValue.id : null);
     });
 })(AJS.$);
