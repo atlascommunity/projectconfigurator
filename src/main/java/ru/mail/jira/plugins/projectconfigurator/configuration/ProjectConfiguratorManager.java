@@ -257,7 +257,7 @@ public class ProjectConfiguratorManager {
     }
 
     public Collection<PermissionScheme> getAllPermissionSchemes() {
-        return permissionSchemeService.getPermissionSchemes(userManager.getUserByKey(pluginData.getAdminUserKey())).get();
+        return permissionSchemeService.getPermissionSchemes(jiraAuthenticationContext.getLoggedInUser()).get();
     }
 
     public Collection<Scheme> getAllNotificationSchemes() {
