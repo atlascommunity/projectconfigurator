@@ -8,6 +8,8 @@ import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.workflow.function.issue.AbstractJiraFunctionProvider;
+import com.atlassian.sal.api.ApplicationProperties;
+import com.atlassian.sal.api.UrlMode;
 import com.opensymphony.module.propertyset.PropertySet;
 import com.opensymphony.workflow.WorkflowException;
 import ru.mail.jira.plugins.projectconfigurator.configuration.PluginData;
@@ -17,12 +19,14 @@ import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfiguration
 import java.util.Map;
 
 public class CreateProjectFromConfiguratorFunction extends AbstractJiraFunctionProvider {
+    private final ApplicationProperties applicationProperties;
     private final CommentManager commentManager;
     private final I18nHelper i18nHelper;
     private final PluginData pluginData;
     private final ProjectConfiguratorManager projectConfiguratorManager;
 
-    public CreateProjectFromConfiguratorFunction(CommentManager commentManager, I18nHelper i18nHelper, PluginData pluginData, ProjectConfiguratorManager projectConfiguratorManager) {
+    public CreateProjectFromConfiguratorFunction(ApplicationProperties applicationProperties, CommentManager commentManager, I18nHelper i18nHelper, PluginData pluginData, ProjectConfiguratorManager projectConfiguratorManager) {
+        this.applicationProperties = applicationProperties;
         this.commentManager = commentManager;
         this.i18nHelper = i18nHelper;
         this.pluginData = pluginData;
@@ -43,7 +47,7 @@ public class CreateProjectFromConfiguratorFunction extends AbstractJiraFunctionP
             if (projectConfiguration == null)
                 throw new Exception(i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.error.field.value.empty", customField.getFieldName()));
             Project project = projectConfiguratorManager.createProject(projectConfiguration);
-            commentManager.create(issue, getCallerUser(transientVars, args), i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.success", project.getName()), true);
+            commentManager.create(issue, getCallerUser(transientVars, args), i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.success", project.getName() , String.format("%s/browse/%s", applicationProperties.getBaseUrl(UrlMode.ABSOLUTE), project.getKey())), true);
         } catch (Exception e) {
             throw new WorkflowException(e);
         }

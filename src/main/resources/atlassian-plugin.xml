@@ -16,6 +16,8 @@
         <interface>ru.mail.jira.plugins.projectconfigurator.configuration.PluginData</interface>
     </component>
 
+    <component-import key="application-properties" interface="com.atlassian.sal.api.ApplicationProperties" />
+
     <component key="project-configurator-manager" class="ru.mail.jira.plugins.projectconfigurator.configuration.ProjectConfiguratorManager" />
 
     <web-resource key="project-configurator-soy-templates">
@@ -46,7 +48,7 @@
         <dependency>com.atlassian.jira.plugins.jira-workflow-designer:workflow-designer-read-only</dependency>
         <dependency>ru.mail.jira.plugins.projectconfigurator:project-configurator-i18n-resource</dependency>
         <resource type="download" name="projectConfigurator.js" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/projectConfigurator.js" />
-        <resource type="download" name="projectConfigurator.js.map" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/projectConfigurator.js.map" />
+        <resource type="download" name="projectConfigurator.css" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/projectConfigurator.css" />
     </web-resource>
 
     <webwork1 key="project-configurator-configuration" class="java.lang.Object" roles-required="admin">

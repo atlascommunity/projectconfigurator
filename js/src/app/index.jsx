@@ -20,7 +20,7 @@ $(() => {
         <Provider store={ store }>
             <LayerManager>
                 <Router history={ history }>
-                    <Route path="/jira/">
+                    <Route path="/">
                         <Route path="projectConfigurator" component={ ProjectConfigurator } />
                     </Route>
                 </Router>

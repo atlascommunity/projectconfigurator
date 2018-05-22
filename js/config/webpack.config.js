@@ -24,7 +24,7 @@ const publicUrl = publicPath.slice(0, -1);
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
 
-const cssDir = '../../src/main/resources/ru/mail/jira/plugins/projectconfigurator/configurator/react';
+const cssDir = '../../src/main/resources/ru/mail/jira/plugins/projectconfigurator/configurator/react/';
 
 const extractLess = new ExtractTextPlugin({
     filename: cssDir + '[name].css',
