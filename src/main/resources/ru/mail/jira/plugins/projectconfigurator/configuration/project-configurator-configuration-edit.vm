@@ -122,7 +122,7 @@
                     <label for="project-configurator-field">$action.getText( "ru.mail.jira.plugins.projectconfigurator.field" )<span class="aui-icon icon-required"></span></label>
                     <select class="select long-field project-configurator-field" name="project-configurator-field" type="text">
                         <option></option>
-                        #foreach( $customField in $action.getAllCustomFields() )
+                        #foreach( $customField in $action.getAllProjectConfiguratorCustomFields() )
                             <option value="$customField.id" #select( [$action.getProjectConfigurationCf()] $customField.id )>$customField.name</option>
                         #end
                     </select>

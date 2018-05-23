@@ -266,8 +266,8 @@ public class ProjectConfiguratorConfigurationEdit extends JiraWebActionSupport {
     }
 
     @SuppressWarnings("unused")
-    public Collection<CustomField> getAllCustomFields() {
-        return projectConfiguratorManager.getAllCustomFields();
+    public Collection<CustomField> getAllProjectConfiguratorCustomFields() {
+        return projectConfiguratorManager.getAllProjectConfiguratorCustomFields();
     }
 
     @SuppressWarnings("unused")

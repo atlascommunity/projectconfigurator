@@ -53,6 +53,7 @@ import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleActor;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.I18nHelper;
@@ -67,6 +68,7 @@ import com.atlassian.jira.workflow.migration.MigrationHelperFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfiguration;
+import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfigurationCFType;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.ItemDto;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.ProcessDto;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.ProjectConfigurationDto;
@@ -264,10 +266,7 @@ public class ProjectConfiguratorManager {
     }
 
     public Collection<ApplicationUser> getAllAdminUsers() {
-        return userSearchService.findUsers("", new UserSearchParams(true, true, false, true, null, null))
-                                                  .stream()
-                                                  .filter(this::isAdministrator)
-                                                  .collect(Collectors.toList());
+        return userSearchService.findUsers("", new UserSearchParams(true, true, false, true, null, null, user -> globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, ApplicationUsers.from(user)), null));
     }
 
     public Collection<ProjectRole> getAllProjectRoles() {
@@ -278,8 +277,12 @@ public class ProjectConfiguratorManager {
         return projectManager.getProjects();
     }
 
-    public Collection<CustomField> getAllCustomFields() {
-        return customFieldManager.getCustomFieldObjects();
+    public Collection<CustomField> getAllProjectConfiguratorCustomFields() {
+        List<CustomField> result = new ArrayList<>();
+        for (CustomField customField : customFieldManager.getCustomFieldObjects())
+            if (customField.getCustomFieldType() instanceof ProjectConfigurationCFType)
+                result.add(customField);
+        return result;
     }
 
     private FieldConfigScheme createFieldConfigScheme(String projectKey, List<IssueType> issueTypes) {
