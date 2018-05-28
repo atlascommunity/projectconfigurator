@@ -209,14 +209,14 @@ class ProjectConfigurator extends React.Component {
         return properties.context === 'value' ?
             (
                 <div className="issue-type-select-value">
-                    <img alt={option.name} src={`${AJS.contextPath()}\\${option.avatarUrl}`} />
+                    <img alt={option.name} src={option.avatarUrl} />
                     <span>{option.name}</span>
                 </div>
             ) :
             (
                 <div className="issue-type-select-menu">
                     <span>{option.name}</span>
-                    <img alt={option.name} src={`${AJS.contextPath()}\\${option.avatarUrl}`} />
+                    <img alt={option.name} src={option.avatarUrl} />
                 </div>
             );
     };
@@ -456,7 +456,7 @@ class ProjectConfigurator extends React.Component {
                                                         >
                                                             <div className="workflow-assign-inner">
                                                                 <div className="workflow-assign-inner-issue-type">
-                                                                    <img alt={issueType.name} src={`${AJS.contextPath()}\\${issueType.avatarUrl}`} />
+                                                                    <img alt={issueType.name} src={issueType.avatarUrl} />
                                                                     <span>{issueType.name}</span>
                                                                 </div>
                                                                 {this.state.workflows.hasOwnProperty(issueType.id) ?
@@ -493,7 +493,7 @@ class ProjectConfigurator extends React.Component {
                                     this.state.issueTypes.map(issueType => (
                                         <div className="issue-type-screen-scheme" key={issueType.id}>
                                             <div className="issue-type-select-value">
-                                                <img alt={issueType.name} src={`${AJS.contextPath()}\\${issueType.avatarUrl}`} />
+                                                <img alt={issueType.name} src={issueType.avatarUrl} />
                                                 <span>{issueType.name}</span>
                                             </div>
                                             <div>
