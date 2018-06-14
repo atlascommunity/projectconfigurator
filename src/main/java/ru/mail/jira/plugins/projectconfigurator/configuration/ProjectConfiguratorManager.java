@@ -6,6 +6,7 @@ import com.atlassian.jira.avatar.Avatar;
 import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
+import com.atlassian.jira.bc.ServiceOutcome;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.fields.screen.FieldScreenService;
 import com.atlassian.jira.bc.project.ProjectCreationData;
@@ -13,9 +14,11 @@ import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.bc.projectroles.ProjectRoleService;
 import com.atlassian.jira.bc.user.search.UserSearchParams;
 import com.atlassian.jira.bc.user.search.UserSearchService;
+import com.atlassian.jira.bc.workflow.WorkflowSchemeService;
 import com.atlassian.jira.config.IssueTypeManager;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.context.JiraContextNode;
 import com.atlassian.jira.issue.customfields.CustomFieldUtils;
@@ -67,6 +70,8 @@ import com.atlassian.jira.workflow.migration.AssignableWorkflowSchemeMigrationHe
 import com.atlassian.jira.workflow.migration.MigrationHelperFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfiguration;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfigurationCFType;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.ItemDto;
@@ -83,6 +88,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ProjectConfiguratorManager {
+    private final static Logger log = LoggerFactory.getLogger(ProjectConfiguratorManager.class);
+
     private final AvatarService avatarService;
     private final CustomFieldManager customFieldManager;
     private final I18nHelper i18nHelper;
@@ -111,10 +118,11 @@ public class ProjectConfiguratorManager {
     private final ProjectRoleService projectRoleService;
     private final WorkflowManager workflowManager;
     private final WorkflowSchemeManager workflowSchemeManager;
+    private final WorkflowSchemeService workflowSchemeService;
     private final UserManager userManager;
     private final UserSearchService userSearchService;
 
-    public ProjectConfiguratorManager(AvatarService avatarService, CustomFieldManager customFieldManager, I18nHelper i18nHelper, IssueService issueService, IssueTypeManager issueTypeManager, IssueTypeSchemeManager issueTypeSchemeManager, IssueTypeScreenSchemeManager issueTypeScreenSchemeManager, FieldConfigSchemeManager fieldConfigSchemeManager, FieldManager fieldManager, FieldScreenFactory fieldScreenFactory, FieldScreenManager fieldScreenManager, FieldScreenService fieldScreenService, GlobalPermissionManager globalPermissionManager, GroupManager groupManager, JiraAuthenticationContext jiraAuthenticationContext, MigrationHelperFactory migrationHelperFactory, NotificationSchemeService notificationSchemeService, PermissionSchemeService permissionSchemeService, FieldScreenSchemeManager fieldScreenSchemeManager, NotificationSchemeManager notificationSchemeManager, PermissionSchemeManager permissionSchemeManager, PluginData pluginData, ProjectManager projectManager, ProjectService projectService, ProjectRoleManager projectRoleManager, ProjectRoleService projectRoleService, WorkflowManager workflowManager, WorkflowSchemeManager workflowSchemeManager, UserManager userManager, UserSearchService userSearchService) {
+    public ProjectConfiguratorManager(AvatarService avatarService, CustomFieldManager customFieldManager, I18nHelper i18nHelper, IssueService issueService, IssueTypeManager issueTypeManager, IssueTypeSchemeManager issueTypeSchemeManager, IssueTypeScreenSchemeManager issueTypeScreenSchemeManager, FieldConfigSchemeManager fieldConfigSchemeManager, FieldManager fieldManager, FieldScreenFactory fieldScreenFactory, FieldScreenManager fieldScreenManager, FieldScreenService fieldScreenService, GlobalPermissionManager globalPermissionManager, GroupManager groupManager, JiraAuthenticationContext jiraAuthenticationContext, MigrationHelperFactory migrationHelperFactory, NotificationSchemeService notificationSchemeService, PermissionSchemeService permissionSchemeService, FieldScreenSchemeManager fieldScreenSchemeManager, NotificationSchemeManager notificationSchemeManager, PermissionSchemeManager permissionSchemeManager, PluginData pluginData, ProjectManager projectManager, ProjectService projectService, ProjectRoleManager projectRoleManager, ProjectRoleService projectRoleService, WorkflowManager workflowManager, WorkflowSchemeManager workflowSchemeManager, WorkflowSchemeService workflowSchemeService, UserManager userManager, UserSearchService userSearchService) {
         this.avatarService = avatarService;
         this.customFieldManager = customFieldManager;
         this.i18nHelper = i18nHelper;
@@ -143,6 +151,7 @@ public class ProjectConfiguratorManager {
         this.projectRoleService = projectRoleService;
         this.workflowManager = workflowManager;
         this.workflowSchemeManager = workflowSchemeManager;
+        this.workflowSchemeService = workflowSchemeService;
         this.userManager = userManager;
         this.userSearchService = userSearchService;
     }
@@ -285,6 +294,15 @@ public class ProjectConfiguratorManager {
         return result;
     }
 
+    private String formatErrorCollections(ErrorCollection errorCollection) {
+        StringBuilder errors = new StringBuilder();
+        for (Map.Entry<String, String> error: errorCollection.getErrors().entrySet())
+            errors.append(String.format("Key: %s. Message: %s.\n", error.getKey(), error.getValue()));
+        for (String errorMessage : errorCollection.getErrorMessages())
+            errors.append(String.format("Error Message: %s.\n", errorMessage));
+        return errors.toString();
+    }
+
     private FieldConfigScheme createFieldConfigScheme(String projectKey, List<IssueType> issueTypes) {
         List<String> issueTypeIds = new ArrayList<>();
         for (IssueType issueType : issueTypes)
@@ -292,14 +310,13 @@ public class ProjectConfiguratorManager {
         return issueTypeSchemeManager.create(String.format("%s Issue Types Scheme", projectKey), null, issueTypeIds);
     }
 
-    private void associateIssueTypeSchemeWithProject(Project project, List<IssueType> issueTypes) {
-        FieldConfigScheme fieldConfigScheme = createFieldConfigScheme(project.getKey(), issueTypes);
+    private void associateIssueTypeSchemeWithProject(Project project, FieldConfigScheme issueTypeScheme) {
         List<JiraContextNode> contexts = CustomFieldUtils.buildJiraIssueContexts(false, new Long[]{project.getId()}, projectManager);
-        fieldConfigSchemeManager.updateFieldConfigScheme(fieldConfigScheme, contexts, fieldManager.getConfigurableField(fieldManager.getIssueTypeField().getId()));
+        fieldConfigSchemeManager.updateFieldConfigScheme(issueTypeScheme, contexts, fieldManager.getConfigurableField(IssueFieldConstants.ISSUE_TYPE));
         fieldManager.refresh();
     }
 
-    private FieldScreenScheme copyFieldScreenScheme(String projectKey, String issueTypeName, FieldScreenScheme fieldScreenScheme) {
+    private FieldScreenScheme copyFieldScreenScheme(String projectKey, String issueTypeName, FieldScreenScheme fieldScreenScheme) throws Exception {
         FieldScreenScheme copyFieldScreenScheme = fieldScreenFactory.createFieldScreenScheme();
         copyFieldScreenScheme.setName(String.format("%s %s Screen Scheme", projectKey, issueTypeName));
         copyFieldScreenScheme.setDescription(null);
@@ -307,9 +324,12 @@ public class ProjectConfiguratorManager {
 
         // Copy all the scheme entities
         for (FieldScreenSchemeItem fieldScreenSchemeItem : fieldScreenScheme.getFieldScreenSchemeItems()) {
-            FieldScreen copyScreen = fieldScreenService.copy(fieldScreenSchemeItem.getFieldScreen(), String.format("%s %s %s Screen", projectKey, issueTypeName, i18nHelper.getText(fieldScreenSchemeItem.getIssueOperationName())), fieldScreenSchemeItem.getFieldScreen().getDescription(), userManager.getUserByKey(pluginData.getAdminUserKey())).get();
+            ServiceOutcome<FieldScreen> copyScreenResult = fieldScreenService.copy(fieldScreenSchemeItem.getFieldScreen(), String.format("%s %s %s Screen", projectKey, issueTypeName, i18nHelper.getText(fieldScreenSchemeItem.getIssueOperationName())), fieldScreenSchemeItem.getFieldScreen().getDescription(), userManager.getUserByKey(pluginData.getAdminUserKey()));
+            if (copyScreenResult.getErrorCollection().hasAnyErrors())
+                throw new Exception(formatErrorCollections(copyScreenResult.getErrorCollection()));
+
             FieldScreenSchemeItem copyFieldScreenSchemeItem = new FieldScreenSchemeItemImpl(fieldScreenSchemeManager, fieldScreenSchemeItem, fieldScreenManager);
-            copyFieldScreenSchemeItem.setFieldScreen(copyScreen);
+            copyFieldScreenSchemeItem.setFieldScreen(copyScreenResult.getReturnedValue());
             copyFieldScreenScheme.addFieldScreenSchemeItem(copyFieldScreenSchemeItem);
         }
         return copyFieldScreenScheme;
@@ -322,7 +342,7 @@ public class ProjectConfiguratorManager {
         return issueTypeScreenSchemeEntity;
     }
 
-    private IssueTypeScreenScheme createIssueTypeScreenScheme(String projectKey, List<ProjectConfiguration.Process> processes) {
+    private IssueTypeScreenScheme createIssueTypeScreenScheme(String projectKey, List<ProjectConfiguration.Process> processes) throws Exception {
         final IssueTypeScreenScheme issueTypeScreenScheme = fieldScreenFactory.createIssueTypeScreenScheme();
         issueTypeScreenScheme.setName(String.format("%s Issue Types Screen Scheme", projectKey));
         issueTypeScreenScheme.setDescription(null);
@@ -338,12 +358,11 @@ public class ProjectConfiguratorManager {
         return issueTypeScreenScheme;
     }
 
-    private void associateIssueTypeScreenSchemeWithProject(Project project, List<ProjectConfiguration.Process> processes) {
-        IssueTypeScreenScheme issueTypeScreenScheme = createIssueTypeScreenScheme(project.getKey(), processes);
+    private void associateIssueTypeScreenSchemeWithProject(Project project, IssueTypeScreenScheme issueTypeScreenScheme) {
         issueTypeScreenSchemeManager.addSchemeAssociation(project, issueTypeScreenScheme);
     }
 
-    private AssignableWorkflowScheme createWorkflowScheme(String projectKey, List<ProjectConfiguration.Process> processes) {
+    private AssignableWorkflowScheme createWorkflowScheme(String projectKey, List<ProjectConfiguration.Process> processes) throws Exception {
         AssignableWorkflowScheme.Builder assignableWorkflowSchemeBuilder = workflowSchemeManager.assignableBuilder();
         assignableWorkflowSchemeBuilder.setName(String.format("%s Workflow Scheme", projectKey));
         for(ProjectConfiguration.Process process : processes) {
@@ -352,21 +371,32 @@ public class ProjectConfiguratorManager {
             JiraWorkflow copyWorkflow = workflowManager.copyWorkflow(userManager.getUserByKey(pluginData.getAdminUserKey()), String.format("%s %s Workflow", projectKey, issueType.getName()), null, workflow);
             assignableWorkflowSchemeBuilder.setMapping(issueType.getId(), copyWorkflow.getName());
         }
-        return workflowSchemeManager.createScheme(assignableWorkflowSchemeBuilder.build());
+        ServiceOutcome<AssignableWorkflowScheme> createWorkflowSchemeResult = workflowSchemeService.createScheme(userManager.getUserByKey(pluginData.getAdminUserKey()), assignableWorkflowSchemeBuilder.build());
+        if (createWorkflowSchemeResult.getErrorCollection().hasAnyErrors())
+            throw new Exception(formatErrorCollections(createWorkflowSchemeResult.getErrorCollection()));
+        return createWorkflowSchemeResult.getReturnedValue();
     }
 
-    private void associateWorkflowSchemeWithProject(Project project, List<ProjectConfiguration.Process> processes) throws Exception {
-        AssignableWorkflowScheme workflowScheme = createWorkflowScheme(project.getKey(), processes);
-        AssignableWorkflowSchemeMigrationHelper migrationHelper = migrationHelperFactory.createMigrationHelper(project, workflowScheme);
-        migrationHelper.associateProjectAndWorkflowScheme();
+    private void associateWorkflowSchemeWithProject(Project project, AssignableWorkflowScheme workflowScheme) throws Exception {
+        if (workflowScheme != null) {
+            AssignableWorkflowSchemeMigrationHelper migrationHelper = migrationHelperFactory.createMigrationHelper(project, workflowScheme);
+            migrationHelper.associateProjectAndWorkflowScheme();
+        }
     }
 
-    private void associateSchemeWithProject(Project project, Long schemeId, String schemeType, SchemeManager schemeManager) {
+    private Scheme copyScheme(String projectKey, Long schemeId, String schemeType, SchemeManager schemeManager) throws Exception {
         Scheme copyScheme = schemeManager.copyScheme(schemeManager.getSchemeObject(schemeId));
-        copyScheme.setName(String.format("%s %s Scheme", project.getKey(), schemeType));
+        copyScheme.setName(String.format("%s %s Scheme", projectKey, schemeType));
         schemeManager.updateScheme(copyScheme);
-        schemeManager.removeSchemesFromProject(project);
-        schemeManager.addSchemeToProject(project, copyScheme);
+        return copyScheme;
+    }
+
+    private void associateSchemesWithProject(Project project, Scheme permissionScheme, Scheme notificationScheme) {
+        ProjectService.UpdateProjectSchemesValidationResult updateProjectSchemesValidationResult = projectService.validateUpdateProjectSchemes(userManager.getUserByKey(pluginData.getAdminUserKey()), permissionScheme != null ? permissionScheme.getId() : -1L, notificationScheme != null ? notificationScheme.getId() : -1, -1L);
+        if (updateProjectSchemesValidationResult.isValid())
+            projectService.updateProjectSchemes(updateProjectSchemesValidationResult, project);
+        else
+            log.error(formatErrorCollections(updateProjectSchemesValidationResult.getErrorCollection()));
     }
 
     private void associateUsersWithProjectRoles(Project project, List<ProjectConfiguration.Role> roles) {
@@ -537,6 +567,15 @@ public class ProjectConfiguratorManager {
     }
 
     public Project createProject(ProjectConfiguration projectConfiguration) throws Exception {
+        List<IssueType> issueTypes = projectConfiguration.getProcesses().stream().map(ProjectConfiguration.Process::getIssueType).collect(Collectors.toList());
+        String projectKey = projectConfiguration.getProjectKey();
+
+        FieldConfigScheme issueTypeScheme = createFieldConfigScheme(projectKey, issueTypes);
+        IssueTypeScreenScheme issueTypeScreenScheme = createIssueTypeScreenScheme(projectKey, projectConfiguration.getProcesses());
+        AssignableWorkflowScheme workflowScheme = createWorkflowScheme(projectKey, projectConfiguration.getProcesses());
+        Scheme permissionScheme = copyScheme(projectKey, projectConfiguration.getPermissionScheme().getId(), "Permission", permissionSchemeManager);
+        Scheme notificationScheme = copyScheme(projectKey, projectConfiguration.getNotificationScheme().getId(), "Notification", notificationSchemeManager);
+
         ProjectCreationData projectCreationData = new ProjectCreationData.Builder()
                 .withName(projectConfiguration.getProjectName())
                 .withKey(projectConfiguration.getProjectKey())
@@ -546,21 +585,14 @@ public class ProjectConfiguratorManager {
         ProjectService.CreateProjectValidationResult createProjectValidationResult = projectService.validateCreateProject(userManager.getUserByKey(pluginData.getAdminUserKey()), projectCreationData);
         if (createProjectValidationResult.isValid()) {
             Project project = projectService.createProject(createProjectValidationResult);
-            List<IssueType> issueTypes = projectConfiguration.getProcesses().stream().map(ProjectConfiguration.Process::getIssueType).collect(Collectors.toList());
-            associateIssueTypeSchemeWithProject(project, issueTypes);
-            associateIssueTypeScreenSchemeWithProject(project, projectConfiguration.getProcesses());
-            associateWorkflowSchemeWithProject(project, projectConfiguration.getProcesses());
-            associateSchemeWithProject(project, projectConfiguration.getPermissionScheme().getId(), "Permission", permissionSchemeManager);
-            associateSchemeWithProject(project, projectConfiguration.getNotificationScheme().getId(), "Notification", notificationSchemeManager);
+            associateIssueTypeSchemeWithProject(project, issueTypeScheme);
+            associateIssueTypeScreenSchemeWithProject(project, issueTypeScreenScheme);
+            associateWorkflowSchemeWithProject(project, workflowScheme);
+            associateSchemesWithProject(project, permissionScheme, notificationScheme);
             associateUsersWithProjectRoles(project, projectConfiguration.getRoles());
             return project;
         } else {
-            StringBuilder errors = new StringBuilder();
-            for (Map.Entry<String, String> error: createProjectValidationResult.getErrorCollection().getErrors().entrySet())
-                errors.append(String.format("Key: %s. Message: %s.\n", error.getKey(), error.getValue()));
-            for (String errorMessage : createProjectValidationResult.getErrorCollection().getErrorMessages())
-                errors.append(String.format("Error Message: %s.\n", errorMessage));
-            throw new Exception(errors.toString());
+            throw new Exception(formatErrorCollections(createProjectValidationResult.getErrorCollection()));
         }
     }
 
