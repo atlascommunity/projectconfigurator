@@ -75,6 +75,8 @@ import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.UrlMode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfiguration;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfigurationCFType;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.ItemDto;
@@ -91,6 +93,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ProjectConfiguratorManager {
+    private final static Logger log = LoggerFactory.getLogger(ProjectConfiguratorManager.class);
+
     private final ApplicationProperties applicationProperties;
     private final AvatarService avatarService;
     private final CommentManager commentManager;
@@ -400,9 +404,10 @@ public class ProjectConfiguratorManager {
 
     private void associateSchemesWithProject(Project project, Scheme permissionScheme, Scheme notificationScheme) throws Exception {
         ProjectService.UpdateProjectSchemesValidationResult updateProjectSchemesValidationResult = projectService.validateUpdateProjectSchemes(userManager.getUserByKey(pluginData.getAdminUserKey()), permissionScheme != null ? permissionScheme.getId() : -1L, notificationScheme != null ? notificationScheme.getId() : -1, -1L);
-        if (!updateProjectSchemesValidationResult.isValid())
-            throw new Exception(formatErrorCollections(updateProjectSchemesValidationResult.getErrorCollection()));
-        projectService.updateProjectSchemes(updateProjectSchemesValidationResult, project);
+        if (updateProjectSchemesValidationResult.isValid())
+            projectService.updateProjectSchemes(updateProjectSchemesValidationResult, project);
+        else
+            log.error(formatErrorCollections(updateProjectSchemesValidationResult.getErrorCollection()));
     }
 
     private void associateUsersWithProjectRoles(Project project, List<ProjectConfiguration.Role> roles) {
