@@ -20,6 +20,8 @@ import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
+import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.context.JiraContextNode;
 import com.atlassian.jira.issue.customfields.CustomFieldUtils;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -45,6 +47,7 @@ import com.atlassian.jira.permission.GlobalPermissionKey;
 import com.atlassian.jira.permission.PermissionScheme;
 import com.atlassian.jira.permission.PermissionSchemeManager;
 import com.atlassian.jira.permission.PermissionSchemeService;
+import com.atlassian.jira.project.AssigneeTypes;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.scheme.Scheme;
@@ -68,10 +71,10 @@ import com.atlassian.jira.workflow.WorkflowManager;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
 import com.atlassian.jira.workflow.migration.AssignableWorkflowSchemeMigrationHelper;
 import com.atlassian.jira.workflow.migration.MigrationHelperFactory;
+import com.atlassian.sal.api.ApplicationProperties;
+import com.atlassian.sal.api.UrlMode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfiguration;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfigurationCFType;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.ItemDto;
@@ -88,11 +91,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ProjectConfiguratorManager {
-    private final static Logger log = LoggerFactory.getLogger(ProjectConfiguratorManager.class);
-
+    private final ApplicationProperties applicationProperties;
     private final AvatarService avatarService;
+    private final CommentManager commentManager;
     private final CustomFieldManager customFieldManager;
     private final I18nHelper i18nHelper;
+    private final IssueManager issueManager;
     private final IssueService issueService;
     private final IssueTypeManager issueTypeManager;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
@@ -122,10 +126,13 @@ public class ProjectConfiguratorManager {
     private final UserManager userManager;
     private final UserSearchService userSearchService;
 
-    public ProjectConfiguratorManager(AvatarService avatarService, CustomFieldManager customFieldManager, I18nHelper i18nHelper, IssueService issueService, IssueTypeManager issueTypeManager, IssueTypeSchemeManager issueTypeSchemeManager, IssueTypeScreenSchemeManager issueTypeScreenSchemeManager, FieldConfigSchemeManager fieldConfigSchemeManager, FieldManager fieldManager, FieldScreenFactory fieldScreenFactory, FieldScreenManager fieldScreenManager, FieldScreenService fieldScreenService, GlobalPermissionManager globalPermissionManager, GroupManager groupManager, JiraAuthenticationContext jiraAuthenticationContext, MigrationHelperFactory migrationHelperFactory, NotificationSchemeService notificationSchemeService, PermissionSchemeService permissionSchemeService, FieldScreenSchemeManager fieldScreenSchemeManager, NotificationSchemeManager notificationSchemeManager, PermissionSchemeManager permissionSchemeManager, PluginData pluginData, ProjectManager projectManager, ProjectService projectService, ProjectRoleManager projectRoleManager, ProjectRoleService projectRoleService, WorkflowManager workflowManager, WorkflowSchemeManager workflowSchemeManager, WorkflowSchemeService workflowSchemeService, UserManager userManager, UserSearchService userSearchService) {
+    public ProjectConfiguratorManager(ApplicationProperties applicationProperties, AvatarService avatarService, CommentManager commentManager, CustomFieldManager customFieldManager, I18nHelper i18nHelper, IssueManager issueManager, IssueService issueService, IssueTypeManager issueTypeManager, IssueTypeSchemeManager issueTypeSchemeManager, IssueTypeScreenSchemeManager issueTypeScreenSchemeManager, FieldConfigSchemeManager fieldConfigSchemeManager, FieldManager fieldManager, FieldScreenFactory fieldScreenFactory, FieldScreenManager fieldScreenManager, FieldScreenService fieldScreenService, GlobalPermissionManager globalPermissionManager, GroupManager groupManager, JiraAuthenticationContext jiraAuthenticationContext, MigrationHelperFactory migrationHelperFactory, NotificationSchemeService notificationSchemeService, PermissionSchemeService permissionSchemeService, FieldScreenSchemeManager fieldScreenSchemeManager, NotificationSchemeManager notificationSchemeManager, PermissionSchemeManager permissionSchemeManager, PluginData pluginData, ProjectManager projectManager, ProjectService projectService, ProjectRoleManager projectRoleManager, ProjectRoleService projectRoleService, WorkflowManager workflowManager, WorkflowSchemeManager workflowSchemeManager, WorkflowSchemeService workflowSchemeService, UserManager userManager, UserSearchService userSearchService) {
+        this.applicationProperties = applicationProperties;
         this.avatarService = avatarService;
+        this.commentManager = commentManager;
         this.customFieldManager = customFieldManager;
         this.i18nHelper = i18nHelper;
+        this.issueManager = issueManager;
         this.issueService = issueService;
         this.issueTypeManager = issueTypeManager;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
@@ -384,19 +391,18 @@ public class ProjectConfiguratorManager {
         }
     }
 
-    private Scheme copyScheme(String projectKey, Long schemeId, String schemeType, SchemeManager schemeManager) throws Exception {
+    private Scheme copyScheme(String projectKey, Long schemeId, String schemeType, SchemeManager schemeManager) {
         Scheme copyScheme = schemeManager.copyScheme(schemeManager.getSchemeObject(schemeId));
         copyScheme.setName(String.format("%s %s Scheme", projectKey, schemeType));
         schemeManager.updateScheme(copyScheme);
         return copyScheme;
     }
 
-    private void associateSchemesWithProject(Project project, Scheme permissionScheme, Scheme notificationScheme) {
+    private void associateSchemesWithProject(Project project, Scheme permissionScheme, Scheme notificationScheme) throws Exception {
         ProjectService.UpdateProjectSchemesValidationResult updateProjectSchemesValidationResult = projectService.validateUpdateProjectSchemes(userManager.getUserByKey(pluginData.getAdminUserKey()), permissionScheme != null ? permissionScheme.getId() : -1L, notificationScheme != null ? notificationScheme.getId() : -1, -1L);
-        if (updateProjectSchemesValidationResult.isValid())
-            projectService.updateProjectSchemes(updateProjectSchemesValidationResult, project);
-        else
-            log.error(formatErrorCollections(updateProjectSchemesValidationResult.getErrorCollection()));
+        if (!updateProjectSchemesValidationResult.isValid())
+            throw new Exception(formatErrorCollections(updateProjectSchemesValidationResult.getErrorCollection()));
+        projectService.updateProjectSchemes(updateProjectSchemesValidationResult, project);
     }
 
     private void associateUsersWithProjectRoles(Project project, List<ProjectConfiguration.Role> roles) {
@@ -566,7 +572,7 @@ public class ProjectConfiguratorManager {
         return value;
     }
 
-    public Project createProject(ProjectConfiguration projectConfiguration) throws Exception {
+    private Project createProject(ProjectConfiguration projectConfiguration) throws Exception {
         List<IssueType> issueTypes = projectConfiguration.getProcesses().stream().map(ProjectConfiguration.Process::getIssueType).collect(Collectors.toList());
         String projectKey = projectConfiguration.getProjectKey();
 
@@ -580,20 +586,44 @@ public class ProjectConfiguratorManager {
                 .withName(projectConfiguration.getProjectName())
                 .withKey(projectConfiguration.getProjectKey())
                 .withLead(projectConfiguration.getProjectLead())
-                .withType("business")
+                .withType("software")
+                .withAssigneeType(AssigneeTypes.PROJECT_LEAD)
                 .build();
         ProjectService.CreateProjectValidationResult createProjectValidationResult = projectService.validateCreateProject(userManager.getUserByKey(pluginData.getAdminUserKey()), projectCreationData);
         if (createProjectValidationResult.isValid()) {
             Project project = projectService.createProject(createProjectValidationResult);
-            associateIssueTypeSchemeWithProject(project, issueTypeScheme);
-            associateIssueTypeScreenSchemeWithProject(project, issueTypeScreenScheme);
-            associateWorkflowSchemeWithProject(project, workflowScheme);
-            associateSchemesWithProject(project, permissionScheme, notificationScheme);
-            associateUsersWithProjectRoles(project, projectConfiguration.getRoles());
+            projectManager.refresh();
+            if (project != null) {
+                associateIssueTypeSchemeWithProject(project, issueTypeScheme);
+                associateIssueTypeScreenSchemeWithProject(project, issueTypeScreenScheme);
+                associateSchemesWithProject(project, permissionScheme, notificationScheme);
+                associateUsersWithProjectRoles(project, projectConfiguration.getRoles());
+                associateWorkflowSchemeWithProject(project, workflowScheme);
+            }
             return project;
         } else {
             throw new Exception(formatErrorCollections(createProjectValidationResult.getErrorCollection()));
         }
+    }
+
+    public Project createProjectFromIssue(String issueKey) throws Exception {
+        Issue issue = issueManager.getIssueObject(issueKey);
+        if (issue == null)
+            throw new Exception(i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.error.issue.exist", issueKey));
+        CustomField customField = customFieldManager.getCustomFieldObject(pluginData.getProjectConfigurationCfId());
+        if (customField == null)
+            throw new Exception(i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.error.field.empty", pluginData.getProjectConfigurationCfId()));
+        ProjectConfiguration projectConfiguration = (ProjectConfiguration) issue.getCustomFieldValue(customField);
+        if (projectConfiguration == null)
+            throw new Exception(i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.error.field.value.empty", customField.getFieldName()));
+        if (projectManager.getProjectByCurrentKey(projectConfiguration.getProjectKey()) != null)
+            throw new Exception(i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.error.project.exist", projectConfiguration.getProjectName()));
+
+        Project project = createProject(projectConfiguration);
+        if (project != null) {
+            commentManager.create(issue, jiraAuthenticationContext.getLoggedInUser(), i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.success", project.getName() , String.format("%s/browse/%s", applicationProperties.getBaseUrl(UrlMode.ABSOLUTE), project.getKey())), true);
+        }
+        return project;
     }
 
     public List<UserDto> findUsers(ApplicationUser user, String filter) {

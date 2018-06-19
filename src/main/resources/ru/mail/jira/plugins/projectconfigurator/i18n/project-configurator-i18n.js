@@ -68,10 +68,12 @@ define('project-configurator/i18n', function () {
 		'ru.mail.jira.plugins.projectconfigurator.page.notifications': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.notifications'),
 		'ru.mail.jira.plugins.projectconfigurator.page.notificationScheme': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.notificationScheme'),
 		'ru.mail.jira.plugins.projectconfigurator.page.notifications.select': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.notifications.select'),
+		'ru.mail.jira.plugins.projectconfigurator.creation': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation'),
 		'ru.mail.jira.plugins.projectconfigurator.creation.summary': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.summary'),
-		'ru.mail.jira.plugins.projectconfigurator.creation.error.field': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.error.field'),
+		'ru.mail.jira.plugins.projectconfigurator.creation.error.issue.exist': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.error.issue.exist'),
 		'ru.mail.jira.plugins.projectconfigurator.creation.error.field.empty': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.error.field.empty'),
 		'ru.mail.jira.plugins.projectconfigurator.creation.error.field.value.empty': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.error.field.value.empty'),
+		'ru.mail.jira.plugins.projectconfigurator.creation.error.project.exist': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.error.project.exist'),
 		'ru.mail.jira.plugins.projectconfigurator.creation.success': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.success'),
         //GENERATED CONTENT END
     };

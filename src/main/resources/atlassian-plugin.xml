@@ -99,16 +99,21 @@
         <link linkId="project-configurator-configuration-link">/secure/admin/ProjectConfiguratorConfiguration.jspa</link>
     </web-item>
 
+    <web-resource key="project-configuration-field-resource">
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-flag</dependency>
+        <resource type="download" name="project-configuration-field.css" location="/ru/mail/jira/plugins/projectconfigurator/customfield/project-configuration-field.css" />
+        <resource type="download" name="project-configuration-field.js" location="/ru/mail/jira/plugins/projectconfigurator/customfield/project-configuration-field.js" />
+        <context>atl.general</context>
+    </web-resource>
+
     <customfield-type key="project-configuration-field" i18n-name-key="ru.mail.jira.plugins.projectconfigurator.field" class="ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfigurationCFType">
         <description key="ru.mail.jira.plugins.projectconfigurator.field.description" />
         <resource type="velocity" name="view" location="/ru/mail/jira/plugins/projectconfigurator/customfield/project-configuration-field-view.vm" />
     </customfield-type>
-
-    <workflow-function key="approve-contragent-function" name="Create Project" class="com.atlassian.jira.plugin.workflow.WorkflowNoInputPluginFactory">
-        <description>Create project from project configurator</description>
-        <function-class>ru.mail.jira.plugins.projectconfigurator.function.CreateProjectFromConfiguratorFunction</function-class>
-        <resource type="velocity" name="view"><![CDATA[Create Project]]></resource>
-    </workflow-function>
 
     <web-item key="project-configuration-menu-link" name="Project Configuration Link" section="system.top.navigation.bar" weight="200">
         <conditions type="AND">

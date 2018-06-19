@@ -24,6 +24,7 @@ import ru.mail.jira.plugins.projectconfigurator.rest.dto.UserDto;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -186,6 +187,19 @@ public class RestProjectConfiguratorService {
             protected Map<String, String> doAction() throws Exception {
                 Map<String, String> result = new HashMap<>();
                 result.put("issueKey", projectConfiguratorManager.createProjectConfigurationTask(projectConfigurationDto));
+                return result;
+            }
+        }.getResponse();
+    }
+
+    @GET
+    @Path("/createProject/{issueKey}")
+    public Response creteProject(@PathParam("issueKey") final String issueKey) {
+        return new RestExecutor<Map<String, String>>() {
+            @Override
+            protected Map<String, String> doAction() throws Exception {
+                Map<String, String> result = new HashMap<>();
+                result.put("projectKey", projectConfiguratorManager.createProjectFromIssue(issueKey).getKey());
                 return result;
             }
         }.getResponse();

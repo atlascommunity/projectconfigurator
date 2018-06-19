@@ -1,79 +1,86 @@
 #if ( $value )
-    <div class="aui-tabs horizontal-tabs">
-        <ul class="tabs-menu">
-            <li class="menu-item active-tab">
-                <a href="#project-configuration-general">$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.field.view.general" )</a>
-            </li>
-            <li class="menu-item">
-                <a href="#project-configuration-processes">$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.field.view.processes" )</a>
-            </li>
-            <li class="menu-item">
-                <a href="#project-configuration-roles">$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.field.view.roles" )</a>
-            </li>
-        </ul>
-        <div class="tabs-pane active-pane" id="project-configuration-general">
-            <div style=" margin-top: 10px;">
-                <dl>
-                    <dt style="color: #707070;">$i18n.getText( "common.words.project" ):</dt>
-                    <dd>$value.projectName ($value.projectKey)</dd>
-                    <dt style="color: #707070;">$i18n.getText( "common.concepts.projectlead" ):</dt>
-                    <dd>
-                        <a class="user-hover user-avatar" rel="$value.projectLead.key" href="/jira/secure/ViewProfile.jspa?name=$value.projectLead.key">$value.projectLead.displayName</a>
-                    </dd>
-                    <dt style="color: #707070;">$i18n.getText( "admin.projects.permission.scheme" ):</dt>
-                    <dd>$value.permissionScheme.name</dd>
-                    <dt style="color: #707070;">$i18n.getText( "admin.projects.notification.scheme" ):</dt>
-                    <dd>$value.notificationScheme.name</dd>
-                </dl>
+    <div class="project-configurator-custom-field">
+        <div class="aui-tabs horizontal-tabs">
+            <ul class="tabs-menu">
+                <li class="menu-item active-tab">
+                    <a href="#project-configuration-general">$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.field.view.general" )</a>
+                </li>
+                <li class="menu-item">
+                    <a href="#project-configuration-processes">$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.field.view.processes" )</a>
+                </li>
+                <li class="menu-item">
+                    <a href="#project-configuration-roles">$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.field.view.roles" )</a>
+                </li>
+            </ul>
+            <div class="tabs-pane active-pane" id="project-configuration-general">
+                <div style=" margin-top: 10px;">
+                    <dl>
+                        <dt style="color: #707070;">$i18n.getText( "common.words.project" ):</dt>
+                        <dd>$value.projectName ($value.projectKey)</dd>
+                        <dt style="color: #707070;">$i18n.getText( "common.concepts.projectlead" ):</dt>
+                        <dd>
+                            <a class="user-hover user-avatar" rel="$value.projectLead.key" href="/jira/secure/ViewProfile.jspa?name=$value.projectLead.key">$value.projectLead.displayName</a>
+                        </dd>
+                        <dt style="color: #707070;">$i18n.getText( "admin.projects.permission.scheme" ):</dt>
+                        <dd>$value.permissionScheme.name</dd>
+                        <dt style="color: #707070;">$i18n.getText( "admin.projects.notification.scheme" ):</dt>
+                        <dd>$value.notificationScheme.name</dd>
+                    </dl>
+                </div>
             </div>
-        </div>
-        <div class="tabs-pane" id="project-configuration-processes">
-            <table class="aui">
-                <thead>
+            <div class="tabs-pane" id="project-configuration-processes">
+                <table class="aui">
+                    <thead>
                     <tr>
                         <th id="issueType">$i18n.getText( "issue.field.issuetype" )</th>
                         <th id="workflow">$i18n.getText( "issue.field.workflow" )</th>
                         <th id="screenScheme">$i18n.getText( "admin.projects.screen.scheme" )</th>
                     </tr>
-                </thead>
-                <tbody>
-                    #foreach($process in $value.getProcesses())
+                    </thead>
+                    <tbody>
+                        #foreach($process in $value.getProcesses())
                         <tr>
                             <td headers="issueType">$process.issueType.name</td>
                             <td headers="workflow">$process.jiraWorkflow.name</td>
                             <td class="screenScheme">$process.fieldScreenScheme.name</td>
                         </tr>
-                    #end
-                </tbody>
-            </table>
-        </div>
-        <div class="tabs-pane" id="project-configuration-roles">
-            <table class="aui">
-                <thead>
-                <tr>
-                    <th id="role">$i18n.getText( "admin.common.words.projectrole" )</th>
-                    <th id="users">$i18n.getText( "admin.systeminfo.users" )</th>
-                    <th id="users">$i18n.getText( "admin.systeminfo.groups" )</th>
-                </tr>
-                </thead>
-                <tbody>
-                    #foreach($role in $value.roles)
+                        #end
+                    </tbody>
+                </table>
+            </div>
+            <div class="tabs-pane" id="project-configuration-roles">
+                <table class="aui">
+                    <thead>
                     <tr>
-                        <td headers="role">$role.projectRole.name</td>
-                        <td headers="users">
-                            #foreach($user in $role.users)
-                                <div>$user.displayName</div>
-                            #end
-                        </td>
-                        <td headers="groups">
-                            #foreach($group in $role.groups)
-                                <div>$group.name</div>
-                            #end
-                        </td>
+                        <th id="role">$i18n.getText( "admin.common.words.projectrole" )</th>
+                        <th id="users">$i18n.getText( "admin.systeminfo.users" )</th>
+                        <th id="users">$i18n.getText( "admin.systeminfo.groups" )</th>
                     </tr>
-                    #end
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        #foreach($role in $value.roles)
+                        <tr>
+                            <td headers="role">$role.projectRole.name</td>
+                            <td headers="users">
+                                #foreach($user in $role.users)
+                                    <div>$user.displayName</div>
+                                #end
+                            </td>
+                            <td headers="groups">hasCreateProjectPermission
+                                #foreach($group in $role.groups)
+                                    <div>$group.name</div>
+                                #end
+                            </td>
+                        </tr>
+                        #end
+                    </tbody>
+                </table>
+            </div>
         </div>
+        #if ( $customField.customFieldType.hasCreateProjectPermission( $value.projectKey ))
+            <div class="project-configurator-custom-field-operations">
+                <button class="aui-button project-configurator-custom-field-create-project" data-issue-key="$issue.key">$i18n.getText( "ru.mail.jira.plugins.projectconfigurator.creation" )</button>
+            </div>
+        #end
     </div>
 #end
