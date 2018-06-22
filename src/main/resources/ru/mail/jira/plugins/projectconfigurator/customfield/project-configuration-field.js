@@ -7,14 +7,14 @@
                 type: 'GET',
                 url: AJS.contextPath() + '/rest/projectconfigurator/latest/configuration/createProject/' + $(this).attr('data-issue-key'),
                 context: this,
-                success: function (result) {
+                success: function (project) {
                     AJS.undim();
                     JIRA.Loading.hideLoadingIndicator();
                     $(this).parent().remove();
                     AJS.flag({
                         type: 'success',
-                        title: 'Project has been created.',
-                        body: 'http://localhost:2990/jira/browse/' + result.projectKey
+                        title: 'Project has been created!',
+                        body: AJS.format('<a href="{0}/browse/{1}">{2}</a>', AJS.params.baseURL, project.key, project.name )
                     });
                 },
                 error: function (request) {

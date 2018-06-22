@@ -10,6 +10,7 @@ import com.atlassian.jira.issue.fields.screen.FieldScreenTab;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.notification.NotificationScheme;
 import com.atlassian.jira.permission.PermissionScheme;
+import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.workflow.JiraWorkflow;
@@ -198,8 +199,11 @@ public class RestProjectConfiguratorService {
         return new RestExecutor<Map<String, String>>() {
             @Override
             protected Map<String, String> doAction() throws Exception {
+                Project project = projectConfiguratorManager.createProjectFromIssue(issueKey);
+
                 Map<String, String> result = new HashMap<>();
-                result.put("projectKey", projectConfiguratorManager.createProjectFromIssue(issueKey).getKey());
+                result.put("key", project.getKey());
+                result.put("name", project.getName());
                 return result;
             }
         }.getResponse();

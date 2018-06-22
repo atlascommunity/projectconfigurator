@@ -336,7 +336,7 @@ public class ProjectConfiguratorManager {
         // Copy all the scheme entities
         for (FieldScreenSchemeItem fieldScreenSchemeItem : fieldScreenScheme.getFieldScreenSchemeItems()) {
             ServiceOutcome<FieldScreen> copyScreenResult = fieldScreenService.copy(fieldScreenSchemeItem.getFieldScreen(), String.format("%s %s %s Screen", projectKey, issueTypeName, i18nHelper.getText(fieldScreenSchemeItem.getIssueOperationName())), fieldScreenSchemeItem.getFieldScreen().getDescription(), userManager.getUserByKey(pluginData.getAdminUserKey()));
-            if (copyScreenResult.getErrorCollection().hasAnyErrors())
+            if (!copyScreenResult.isValid())
                 throw new Exception(formatErrorCollections(copyScreenResult.getErrorCollection()));
 
             FieldScreenSchemeItem copyFieldScreenSchemeItem = new FieldScreenSchemeItemImpl(fieldScreenSchemeManager, fieldScreenSchemeItem, fieldScreenManager);
@@ -383,7 +383,7 @@ public class ProjectConfiguratorManager {
             assignableWorkflowSchemeBuilder.setMapping(issueType.getId(), copyWorkflow.getName());
         }
         ServiceOutcome<AssignableWorkflowScheme> createWorkflowSchemeResult = workflowSchemeService.createScheme(userManager.getUserByKey(pluginData.getAdminUserKey()), assignableWorkflowSchemeBuilder.build());
-        if (createWorkflowSchemeResult.getErrorCollection().hasAnyErrors())
+        if (!createWorkflowSchemeResult.isValid())
             throw new Exception(formatErrorCollections(createWorkflowSchemeResult.getErrorCollection()));
         return createWorkflowSchemeResult.getReturnedValue();
     }
