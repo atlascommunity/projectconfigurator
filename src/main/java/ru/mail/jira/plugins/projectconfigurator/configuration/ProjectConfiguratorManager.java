@@ -524,6 +524,7 @@ public class ProjectConfiguratorManager {
         issueInputParameters.addCustomFieldValue(pluginData.getProjectConfigurationCfId(), buildValueFromDto(projectConfigurationDto).toString());
         issueInputParameters.setReporterId(currentUser.getKey());
         issueInputParameters.setSummary(i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.summary", projectConfigurationDto.getProjectName()));
+        issueInputParameters.setApplyDefaultValuesWhenParameterNotProvided(true);
 
         IssueService.CreateValidationResult createValidationResult = issueService.validateCreate(currentUser, issueInputParameters);
         if (createValidationResult.isValid()) {
