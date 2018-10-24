@@ -50,6 +50,9 @@ import com.atlassian.jira.permission.PermissionSchemeService;
 import com.atlassian.jira.project.AssigneeTypes;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
+import com.atlassian.jira.project.type.ProjectType;
+import com.atlassian.jira.project.type.ProjectTypeKey;
+import com.atlassian.jira.project.type.ProjectTypeKeys;
 import com.atlassian.jira.scheme.Scheme;
 import com.atlassian.jira.scheme.SchemeManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
@@ -592,7 +595,7 @@ public class ProjectConfiguratorManager {
                 .withName(projectConfiguration.getProjectName())
                 .withKey(projectConfiguration.getProjectKey())
                 .withLead(projectConfiguration.getProjectLead())
-                .withType("software")
+                .withType("business")
                 .withAssigneeType(AssigneeTypes.PROJECT_LEAD)
                 .build();
         ProjectService.CreateProjectValidationResult createProjectValidationResult = projectService.validateCreateProject(userManager.getUserByKey(pluginData.getAdminUserKey()), projectCreationData);

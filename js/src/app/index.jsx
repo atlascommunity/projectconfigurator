@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+import AJS from 'AJS';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { browserHistory, Router, Route } from 'react-router';
@@ -20,7 +21,7 @@ $(() => {
         <Provider store={ store }>
             <LayerManager>
                 <Router history={ history }>
-                    <Route path="/">
+                    <Route path={AJS.contextPath()}>
                         <Route path="projectConfigurator" component={ ProjectConfigurator } />
                     </Route>
                 </Router>
