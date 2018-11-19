@@ -50,9 +50,6 @@ import com.atlassian.jira.permission.PermissionSchemeService;
 import com.atlassian.jira.project.AssigneeTypes;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.project.type.ProjectType;
-import com.atlassian.jira.project.type.ProjectTypeKey;
-import com.atlassian.jira.project.type.ProjectTypeKeys;
 import com.atlassian.jira.scheme.Scheme;
 import com.atlassian.jira.scheme.SchemeManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
@@ -310,7 +307,7 @@ public class ProjectConfiguratorManager {
 
     private String formatErrorCollections(ErrorCollection errorCollection) {
         StringBuilder errors = new StringBuilder();
-        for (Map.Entry<String, String> error: errorCollection.getErrors().entrySet())
+        for (Map.Entry<String, String> error : errorCollection.getErrors().entrySet())
             errors.append(String.format("Key: %s. Message: %s.\n", error.getKey(), error.getValue()));
         for (String errorMessage : errorCollection.getErrorMessages())
             errors.append(String.format("Error Message: %s.\n", errorMessage));
@@ -379,7 +376,7 @@ public class ProjectConfiguratorManager {
     private AssignableWorkflowScheme createWorkflowScheme(String projectKey, List<ProjectConfiguration.Process> processes) throws Exception {
         AssignableWorkflowScheme.Builder assignableWorkflowSchemeBuilder = workflowSchemeManager.assignableBuilder();
         assignableWorkflowSchemeBuilder.setName(String.format("%s Workflow Scheme", projectKey));
-        for(ProjectConfiguration.Process process : processes) {
+        for (ProjectConfiguration.Process process : processes) {
             IssueType issueType = process.getIssueType();
             JiraWorkflow workflow = process.getJiraWorkflow();
             JiraWorkflow copyWorkflow = workflowManager.copyWorkflow(userManager.getUserByKey(pluginData.getAdminUserKey()), String.format("%s %s Workflow", projectKey, issueType.getName()), null, workflow);
@@ -471,14 +468,21 @@ public class ProjectConfiguratorManager {
             errors.addError("projectName", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.project.name")));
         else if (StringUtils.trimToNull(projectName).length() > 150)
             errors.addError("projectName", i18nHelper.getText("admin.generalconfiguration.maximum.length.project.names.is.too.large"));
+        else {
+            List<Project> allProjectsList = projectService.getAllProjects(jiraAuthenticationContext.getLoggedInUser()).getReturnedValue();
+            for (Project p : allProjectsList)
+                if (p.getName().equals(projectName))
+                    errors.addError("projectName", i18nHelper.getText("project.name.must.be.unique.error.message"));
+        }
 
         String projectKey = StringUtils.trimToNull(projectConfigurationDto.getProjectKey());
         JiraServiceContext context = new JiraServiceContextImpl(userManager.getUserByKey(pluginData.getAdminUserKey()), new SimpleErrorCollection());
         if (StringUtils.isBlank(StringUtils.trimToNull(projectKey))) {
             errors.addError("projectKey", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.project.key")));
-        }else if (!projectService.isValidProjectKey(context, projectKey)) {
+        } else if (!projectService.isValidProjectKey(context, projectKey)) {
             errors.addErrorCollection(context.getErrorCollection());
         }
+
 
         String projectLeadKey = StringUtils.trimToNull(projectConfigurationDto.getProjectLeadKey());
         if (StringUtils.isBlank(StringUtils.trimToNull(projectLeadKey)))
@@ -510,7 +514,7 @@ public class ProjectConfiguratorManager {
             errors.addError("notificationScheme", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.notificationScheme")));
 
         Collection<RoleDto> roles = projectConfigurationDto.getRoles();
-        if (roles.size() == 0 )
+        if (roles.size() == 0)
             errors.addError("roles", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.roles")));
 
         if (errors.hasAnyErrors())
@@ -630,7 +634,7 @@ public class ProjectConfiguratorManager {
 
         Project project = createProject(projectConfiguration);
         if (project != null) {
-            commentManager.create(issue, jiraAuthenticationContext.getLoggedInUser(), i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.success", project.getName() , String.format("%s/browse/%s", applicationProperties.getBaseUrl(UrlMode.ABSOLUTE), project.getKey())), true);
+            commentManager.create(issue, jiraAuthenticationContext.getLoggedInUser(), i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.creation.success", project.getName(), String.format("%s/browse/%s", applicationProperties.getBaseUrl(UrlMode.ABSOLUTE), project.getKey())), true);
         }
         return project;
     }
