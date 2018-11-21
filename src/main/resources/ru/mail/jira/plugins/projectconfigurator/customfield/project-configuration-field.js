@@ -1,16 +1,26 @@
 (function ($) {
     AJS.toInit(function () {
+
         $(document).on('click', '.project-configurator-custom-field-create-project', function () {
+            AJS.dialog2("#confirmation-dialog").show();
+        });
+
+        $(document).on('click', '#confirmation-dialog-cancel-button', function() {
+            AJS.dialog2("#confirmation-dialog").hide();
+        });
+
+        $(document).on('click', '#confirmation-dialog-submit-button', function() {
+            AJS.dialog2("#confirmation-dialog").hide();
             AJS.dim();
             JIRA.Loading.showLoadingIndicator();
             $.ajax({
                 type: 'GET',
-                url: AJS.contextPath() + '/rest/projectconfigurator/latest/configuration/createProject/' + $(this).attr('data-issue-key'),
-                context: this,
+                url: AJS.contextPath() + '/rest/projectconfigurator/latest/configuration/createProject/'
+                                       + $(".project-configurator-custom-field-operations").children()[0].getAttribute("data-issue-key"),
                 success: function (project) {
                     AJS.undim();
                     JIRA.Loading.hideLoadingIndicator();
-                    $(this).parent().remove();
+                    $(".project-configurator-custom-field-operations").remove();
                     AJS.flag({
                         type: 'success',
                         title: 'Project has been created!',
@@ -30,3 +40,6 @@
         });
     });
 })(AJS.$);
+
+
+
