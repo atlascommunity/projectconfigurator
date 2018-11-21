@@ -468,11 +468,8 @@ public class ProjectConfiguratorManager {
             errors.addError("projectName", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.project.name")));
         else if (StringUtils.trimToNull(projectName).length() > 150)
             errors.addError("projectName", i18nHelper.getText("admin.generalconfiguration.maximum.length.project.names.is.too.large"));
-        else {
-            List<Project> allProjectsList = projectService.getAllProjects(jiraAuthenticationContext.getLoggedInUser()).getReturnedValue();
-            for (Project p : allProjectsList)
-                if (p.getName().equals(projectName))
-                    errors.addError("projectName", i18nHelper.getText("project.name.must.be.unique.error.message"));
+        else if(projectManager.getProjectObjByName(projectName) != null) {
+            errors.addError("projectName", i18nHelper.getText("admin.errors.project.with.that.name.already.exists"));
         }
 
         String projectKey = StringUtils.trimToNull(projectConfigurationDto.getProjectKey());
@@ -482,7 +479,6 @@ public class ProjectConfiguratorManager {
         } else if (!projectService.isValidProjectKey(context, projectKey)) {
             errors.addErrorCollection(context.getErrorCollection());
         }
-
 
         String projectLeadKey = StringUtils.trimToNull(projectConfigurationDto.getProjectLeadKey());
         if (StringUtils.isBlank(StringUtils.trimToNull(projectLeadKey)))
