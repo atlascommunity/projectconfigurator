@@ -75,6 +75,7 @@ define('project-configurator/i18n', function () {
 		'ru.mail.jira.plugins.projectconfigurator.creation.error.field.value.empty': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.error.field.value.empty'),
 		'ru.mail.jira.plugins.projectconfigurator.creation.error.project.exist': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.error.project.exist'),
 		'ru.mail.jira.plugins.projectconfigurator.creation.success': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.creation.success'),
+		'project.name.must.be.unique.error.message': AJS.I18n.getText('project.name.must.be.unique.error.message'),
         //GENERATED CONTENT END
     };
 });
