@@ -37,6 +37,8 @@ define('project-configurator/i18n', function () {
 		'ru.mail.jira.plugins.projectconfigurator.field.view.general': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.field.view.general'),
 		'ru.mail.jira.plugins.projectconfigurator.field.view.processes': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.field.view.processes'),
 		'ru.mail.jira.plugins.projectconfigurator.field.view.roles': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.field.view.roles'),
+		'ru.mail.jira.plugins.projectconfigurator.field.dialog.header': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.field.dialog.header'),
+		'ru.mail.jira.plugins.projectconfigurator.field.dialog.content': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.field.dialog.content'),
 		'ru.mail.jira.plugins.projectconfigurator.page.title': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.title'),
 		'ru.mail.jira.plugins.projectconfigurator.page.generalInformation': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.generalInformation'),
 		'ru.mail.jira.plugins.projectconfigurator.page.project.name': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.name'),
