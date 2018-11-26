@@ -1,6 +1,5 @@
 (function ($) {
     AJS.toInit(function () {
-
         $(document).on('click', '.project-configurator-custom-field-create-project', function () {
             AJS.dialog2("#confirmation-dialog").show();
         });
@@ -40,6 +39,3 @@
         });
     });
 })(AJS.$);
-
-
-
