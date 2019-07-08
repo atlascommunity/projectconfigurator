@@ -1,4 +1,4 @@
-(function ($) {
+require(['jquery', 'aui/flag', 'wrm/context-path'], function($, flag, contextPath) {
     AJS.toInit(function () {
         $(document).on('click', '.project-configurator-custom-field-create-project', function () {
             AJS.dialog2("#confirmation-dialog").show();
@@ -14,7 +14,7 @@
             JIRA.Loading.showLoadingIndicator();
             $.ajax({
                 type: 'GET',
-                url: AJS.contextPath() + '/rest/projectconfigurator/latest/configuration/createProject/'
+                url: contextPath() + '/rest/projectconfigurator/latest/configuration/createProject/'
                                        + $(".project-configurator-custom-field-operations").children()[0].getAttribute("data-issue-key"),
                 success: function (project) {
                     AJS.undim();
@@ -29,7 +29,7 @@
                 error: function (request) {
                     AJS.undim();
                     JIRA.Loading.hideLoadingIndicator();
-                    AJS.flag({
+                    flag({
                         type: 'error',
                         title: 'Project has not been created.',
                         body: request.responseText
@@ -38,4 +38,4 @@
             });
         });
     });
-})(AJS.$);
+});
