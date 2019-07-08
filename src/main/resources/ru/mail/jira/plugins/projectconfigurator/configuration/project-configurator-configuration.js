@@ -1,4 +1,4 @@
-(function ($) {
+require(['jquery'], function($) {
     AJS.toInit(function () {
         $(".project-configurator-workflows").auiSelect2({
             placeholder: "Select a workflows",
@@ -82,4 +82,4 @@
         var fieldValue = $(this).auiSelect2('data');
         $('#project-configurator-field').attr('value', fieldValue != null ? fieldValue.id : null);
     });
-})(AJS.$);
+});
