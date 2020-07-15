@@ -50,6 +50,10 @@ import com.atlassian.jira.permission.PermissionSchemeService;
 import com.atlassian.jira.project.AssigneeTypes;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
+import com.atlassian.jira.project.type.ProjectType;
+import com.atlassian.jira.project.type.ProjectTypeKey;
+import com.atlassian.jira.project.type.ProjectTypeKeys;
+import com.atlassian.jira.project.type.ProjectTypeManager;
 import com.atlassian.jira.scheme.Scheme;
 import com.atlassian.jira.scheme.SchemeManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
@@ -124,13 +128,14 @@ public class ProjectConfiguratorManager {
     private final ProjectService projectService;
     private final ProjectRoleManager projectRoleManager;
     private final ProjectRoleService projectRoleService;
+    private final ProjectTypeManager projectTypeManager;
     private final WorkflowManager workflowManager;
     private final WorkflowSchemeManager workflowSchemeManager;
     private final WorkflowSchemeService workflowSchemeService;
     private final UserManager userManager;
     private final UserSearchService userSearchService;
 
-    public ProjectConfiguratorManager(ApplicationProperties applicationProperties, AvatarService avatarService, CommentManager commentManager, CustomFieldManager customFieldManager, I18nHelper i18nHelper, IssueManager issueManager, IssueService issueService, IssueTypeManager issueTypeManager, IssueTypeSchemeManager issueTypeSchemeManager, IssueTypeScreenSchemeManager issueTypeScreenSchemeManager, FieldConfigSchemeManager fieldConfigSchemeManager, FieldManager fieldManager, FieldScreenFactory fieldScreenFactory, FieldScreenManager fieldScreenManager, FieldScreenService fieldScreenService, GlobalPermissionManager globalPermissionManager, GroupManager groupManager, JiraAuthenticationContext jiraAuthenticationContext, MigrationHelperFactory migrationHelperFactory, NotificationSchemeService notificationSchemeService, PermissionSchemeService permissionSchemeService, FieldScreenSchemeManager fieldScreenSchemeManager, NotificationSchemeManager notificationSchemeManager, PermissionSchemeManager permissionSchemeManager, PluginData pluginData, ProjectManager projectManager, ProjectService projectService, ProjectRoleManager projectRoleManager, ProjectRoleService projectRoleService, WorkflowManager workflowManager, WorkflowSchemeManager workflowSchemeManager, WorkflowSchemeService workflowSchemeService, UserManager userManager, UserSearchService userSearchService) {
+    public ProjectConfiguratorManager(ApplicationProperties applicationProperties, AvatarService avatarService, CommentManager commentManager, CustomFieldManager customFieldManager, I18nHelper i18nHelper, IssueManager issueManager, IssueService issueService, IssueTypeManager issueTypeManager, IssueTypeSchemeManager issueTypeSchemeManager, IssueTypeScreenSchemeManager issueTypeScreenSchemeManager, FieldConfigSchemeManager fieldConfigSchemeManager, FieldManager fieldManager, FieldScreenFactory fieldScreenFactory, FieldScreenManager fieldScreenManager, FieldScreenService fieldScreenService, GlobalPermissionManager globalPermissionManager, GroupManager groupManager, JiraAuthenticationContext jiraAuthenticationContext, MigrationHelperFactory migrationHelperFactory, NotificationSchemeService notificationSchemeService, PermissionSchemeService permissionSchemeService, FieldScreenSchemeManager fieldScreenSchemeManager, NotificationSchemeManager notificationSchemeManager, PermissionSchemeManager permissionSchemeManager, PluginData pluginData, ProjectManager projectManager, ProjectService projectService, ProjectRoleManager projectRoleManager, ProjectRoleService projectRoleService, ProjectTypeManager projectTypeManager, WorkflowManager workflowManager, WorkflowSchemeManager workflowSchemeManager, WorkflowSchemeService workflowSchemeService, UserManager userManager, UserSearchService userSearchService) {
         this.applicationProperties = applicationProperties;
         this.avatarService = avatarService;
         this.commentManager = commentManager;
@@ -160,6 +165,7 @@ public class ProjectConfiguratorManager {
         this.projectService = projectService;
         this.projectRoleManager = projectRoleManager;
         this.projectRoleService = projectRoleService;
+        this.projectTypeManager = projectTypeManager;
         this.workflowManager = workflowManager;
         this.workflowSchemeManager = workflowSchemeManager;
         this.workflowSchemeService = workflowSchemeService;
@@ -486,6 +492,10 @@ public class ProjectConfiguratorManager {
         else if (userManager.getUserByKey(projectLeadKey) == null)
             errors.addError("projectLead", i18nHelper.getText("user.hover.user.does.not.exist", projectLeadKey));
 
+        String projectType = StringUtils.trimToNull(projectConfigurationDto.getProjectType());
+        if (StringUtils.isBlank(StringUtils.trimToNull(projectType)))
+            errors.addError("projectType", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.project.type")));
+
         Collection<ProcessDto> processes = projectConfigurationDto.getProcesses();
         if (processes.size() == 0) {
             errors.addError("issueTypes", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.issueTypes")));
@@ -541,6 +551,11 @@ public class ProjectConfiguratorManager {
             throw new JiraException(createValidationResult.getErrorCollection().toString());
     }
 
+    private ProjectType getProjectType(String projectTypeKeyString) {
+        ProjectTypeKey projectTypeKey = ProjectTypeKeys.JIRA_PROJECT_TYPE_KEYS.stream().filter(type -> type.getKey().equals(projectTypeKeyString)).findFirst().orElse(ProjectTypeKeys.BUSINESS);
+        return projectTypeManager.getAccessibleProjectType(projectTypeKey).getOrNull();
+    }
+
     private ProjectConfiguration buildValueFromDto(ProjectConfigurationDto projectConfigurationDto) {
         if (projectConfigurationDto == null)
             return null;
@@ -574,6 +589,7 @@ public class ProjectConfiguratorManager {
         value.setProjectName(projectConfigurationDto.getProjectName());
         value.setProjectKey(projectConfigurationDto.getProjectKey());
         value.setProjectLead(userManager.getUserByKey(projectConfigurationDto.getProjectLeadKey()));
+        value.setProjectType(getProjectType(projectConfigurationDto.getProjectType()));
         value.setProcesses(processes);
         value.setRoles(roles);
         value.setPermissionScheme(getPermissionScheme(projectConfigurationDto.getPermissionSchemeId()));
@@ -595,7 +611,7 @@ public class ProjectConfiguratorManager {
                 .withName(projectConfiguration.getProjectName())
                 .withKey(projectConfiguration.getProjectKey())
                 .withLead(projectConfiguration.getProjectLead())
-                .withType("business")
+                .withType(projectConfiguration.getProjectType() == null ? ProjectTypeKeys.BUSINESS.getKey() : projectConfiguration.getProjectType().getKey().getKey())
                 .withAssigneeType(AssigneeTypes.PROJECT_LEAD)
                 .build();
         ProjectService.CreateProjectValidationResult createProjectValidationResult = projectService.validateCreateProject(userManager.getUserByKey(pluginData.getAdminUserKey()), projectCreationData);

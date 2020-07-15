@@ -11,6 +11,8 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.notification.NotificationScheme;
 import com.atlassian.jira.permission.PermissionScheme;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.project.type.ProjectType;
+import com.atlassian.jira.project.type.ProjectTypeManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.workflow.JiraWorkflow;
@@ -32,9 +34,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Path("/configuration")
 @Produces({MediaType.APPLICATION_JSON})
@@ -42,12 +46,18 @@ public class RestProjectConfiguratorService {
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final I18nHelper i18nHelper;
     private final ProjectConfiguratorManager projectConfiguratorManager;
+    private final ProjectTypeManager projectTypeManager;
     private final PluginData pluginData;
 
-    public RestProjectConfiguratorService(JiraAuthenticationContext jiraAuthenticationContext, I18nHelper i18nHelper, ProjectConfiguratorManager projectConfiguratorManager, PluginData pluginData) {
+    public RestProjectConfiguratorService(JiraAuthenticationContext jiraAuthenticationContext,
+                                          I18nHelper i18nHelper,
+                                          ProjectConfiguratorManager projectConfiguratorManager,
+                                          ProjectTypeManager projectTypeManager,
+                                          PluginData pluginData) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.i18nHelper = i18nHelper;
         this.projectConfiguratorManager = projectConfiguratorManager;
+        this.projectTypeManager = projectTypeManager;
         this.pluginData = pluginData;
     }
 
@@ -98,6 +108,12 @@ public class RestProjectConfiguratorService {
             @Override
             protected Map<String, Object> doAction() {
                 Map<String, Object> result = new HashMap<>();
+
+                List<ItemDto> projectTypeDtos = new ArrayList<>();
+                for (ProjectType projectType : projectTypeManager.getAllAccessibleProjectTypes()) {
+                    projectTypeDtos.add(new ItemDto(projectType.getKey().getKey(), projectType.getFormattedKey()));
+                }
+                result.put("projectTypes", projectTypeDtos.stream().sorted(Comparator.comparing(ItemDto::getName)).collect(Collectors.toList()));
 
                 List<IssueTypeDto> issueTypeDtos = new ArrayList<>();
                 List<String> issueTypeIds = pluginData.getIssueTypeIds();

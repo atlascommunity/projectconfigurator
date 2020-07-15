@@ -8,6 +8,10 @@ import com.atlassian.jira.issue.customfields.persistence.CustomFieldValuePersist
 import com.atlassian.jira.issue.customfields.persistence.PersistenceFieldType;
 import com.atlassian.jira.permission.GlobalPermissionKey;
 import com.atlassian.jira.project.ProjectManager;
+import com.atlassian.jira.project.type.ProjectType;
+import com.atlassian.jira.project.type.ProjectTypeKey;
+import com.atlassian.jira.project.type.ProjectTypeKeys;
+import com.atlassian.jira.project.type.ProjectTypeManager;
 import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
@@ -35,15 +39,17 @@ public class ProjectConfigurationCFType extends AbstractSingleFieldType<ProjectC
     private final ProjectConfiguratorManager projectConfiguratorManager;
     private final ProjectManager projectManager;
     private final ProjectRoleManager projectRoleManager;
+    private final ProjectTypeManager projectTypeManager;
     private final UserManager userManager;
 
-    protected ProjectConfigurationCFType(CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager, GlobalPermissionManager globalPermissionManager, JiraAuthenticationContext jiraAuthenticationContext, ProjectConfiguratorManager projectConfiguratorManager, ProjectManager projectManager, ProjectRoleManager projectRoleManager, UserManager userManager) {
+    protected ProjectConfigurationCFType(CustomFieldValuePersister customFieldValuePersister, GenericConfigManager genericConfigManager, GlobalPermissionManager globalPermissionManager, JiraAuthenticationContext jiraAuthenticationContext, ProjectConfiguratorManager projectConfiguratorManager, ProjectManager projectManager, ProjectRoleManager projectRoleManager, ProjectTypeManager projectTypeManager, UserManager userManager) {
         super(customFieldValuePersister, genericConfigManager);
         this.globalPermissionManager = globalPermissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.projectConfiguratorManager = projectConfiguratorManager;
         this.projectManager = projectManager;
         this.projectRoleManager = projectRoleManager;
+        this.projectTypeManager = projectTypeManager;
         this.userManager = userManager;
     }
 
@@ -77,6 +83,11 @@ public class ProjectConfigurationCFType extends AbstractSingleFieldType<ProjectC
         } catch (Exception e) {
             throw new FieldValidationException(e.getMessage());
         }
+    }
+
+    private ProjectType getProjectType(String projectTypeKeyString) {
+        ProjectTypeKey projectTypeKey = ProjectTypeKeys.JIRA_PROJECT_TYPE_KEYS.stream().filter(type -> type.getKey().equals(projectTypeKeyString)).findFirst().orElse(ProjectTypeKeys.BUSINESS);
+        return projectTypeManager.getAccessibleProjectType(projectTypeKey).getOrNull();
     }
 
     private ProjectConfiguration buildValue(String strValue) {
@@ -119,6 +130,7 @@ public class ProjectConfigurationCFType extends AbstractSingleFieldType<ProjectC
             value.setProjectName(jsonProjectConfiguration.get("projectName").getAsString());
             value.setProjectKey(jsonProjectConfiguration.get("projectKey").getAsString());
             value.setProjectLead(userManager.getUserByKey(jsonProjectConfiguration.get("projectLeadKey").getAsString()));
+            value.setProjectType(getProjectType(jsonProjectConfiguration.has("projectType") ? jsonProjectConfiguration.get("projectType").getAsString() : null));
             value.setProcesses(processes);
             value.setRoles(roles);
             value.setPermissionScheme(projectConfiguratorManager.getPermissionScheme(jsonProjectConfiguration.get("permissionSchemeId").getAsLong()));
