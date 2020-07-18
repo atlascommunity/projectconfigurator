@@ -469,8 +469,8 @@ public class ProjectConfiguratorManager {
     private void validateProjectConfiguration(ProjectConfigurationDto projectConfigurationDto) {
         ErrorCollection errors = new SimpleErrorCollection();
 
-        String projectName = projectConfigurationDto.getProjectName();
-        if (StringUtils.isBlank(StringUtils.trimToNull(projectName)))
+        String projectName = StringUtils.trimToNull(projectConfigurationDto.getProjectName());
+        if (StringUtils.isBlank(projectName))
             errors.addError("projectName", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.project.name")));
         else if (StringUtils.trimToNull(projectName).length() > 150)
             errors.addError("projectName", i18nHelper.getText("admin.generalconfiguration.maximum.length.project.names.is.too.large"));
@@ -480,20 +480,20 @@ public class ProjectConfiguratorManager {
 
         String projectKey = StringUtils.trimToNull(projectConfigurationDto.getProjectKey());
         JiraServiceContext context = new JiraServiceContextImpl(userManager.getUserByKey(pluginData.getAdminUserKey()), new SimpleErrorCollection());
-        if (StringUtils.isBlank(StringUtils.trimToNull(projectKey))) {
+        if (StringUtils.isBlank(projectKey)) {
             errors.addError("projectKey", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.project.key")));
         } else if (!projectService.isValidProjectKey(context, projectKey)) {
             errors.addErrorCollection(context.getErrorCollection());
         }
 
         String projectLeadKey = StringUtils.trimToNull(projectConfigurationDto.getProjectLeadKey());
-        if (StringUtils.isBlank(StringUtils.trimToNull(projectLeadKey)))
+        if (StringUtils.isBlank(projectLeadKey))
             errors.addError("projectLead", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.project.lead")));
         else if (userManager.getUserByKey(projectLeadKey) == null)
             errors.addError("projectLead", i18nHelper.getText("user.hover.user.does.not.exist", projectLeadKey));
 
         String projectType = StringUtils.trimToNull(projectConfigurationDto.getProjectType());
-        if (StringUtils.isBlank(StringUtils.trimToNull(projectType)))
+        if (StringUtils.isBlank(projectType))
             errors.addError("projectType", i18nHelper.getText("issue.field.required", i18nHelper.getText("ru.mail.jira.plugins.projectconfigurator.page.project.type")));
 
         Collection<ProcessDto> processes = projectConfigurationDto.getProcesses();
