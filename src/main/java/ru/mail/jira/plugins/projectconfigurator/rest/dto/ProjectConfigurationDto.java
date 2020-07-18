@@ -19,6 +19,8 @@ public class ProjectConfigurationDto {
     @XmlElement
     private String projectLeadKey;
     @XmlElement
+    private String projectType;
+    @XmlElement
     private Collection<ProcessDto> processes;
     @XmlElement
     private Collection<RoleDto> roles;
