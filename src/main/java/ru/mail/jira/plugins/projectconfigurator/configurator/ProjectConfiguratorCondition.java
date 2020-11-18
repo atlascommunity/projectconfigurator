@@ -6,14 +6,15 @@ import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.projectconfigurator.configuration.ProjectConfiguratorManager;
 
 public class ProjectConfiguratorCondition extends AbstractWebCondition {
-    private final ProjectConfiguratorManager projectConfiguratorManager;
 
-    public ProjectConfiguratorCondition(ProjectConfiguratorManager projectConfiguratorManager) {
-        this.projectConfiguratorManager = projectConfiguratorManager;
-    }
+  private final ProjectConfiguratorManager projectConfiguratorManager;
 
-    @Override
-    public boolean shouldDisplay(ApplicationUser applicationUser, JiraHelper jiraHelper) {
-        return projectConfiguratorManager.hasPluginConfiguration();
-    }
+  public ProjectConfiguratorCondition(ProjectConfiguratorManager projectConfiguratorManager) {
+    this.projectConfiguratorManager = projectConfiguratorManager;
+  }
+
+  @Override
+  public boolean shouldDisplay(ApplicationUser applicationUser, JiraHelper jiraHelper) {
+    return projectConfiguratorManager.hasPluginConfiguration();
+  }
 }
