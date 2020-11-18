@@ -21,6 +21,8 @@
                         <dd>
                             <a class="user-hover user-avatar" rel="$value.projectLead.key" href="/jira/secure/ViewProfile.jspa?name=$value.projectLead.key">$value.projectLead.displayName</a>
                         </dd>
+                        <dt style="color: #707070;">$i18n.getText( "common.concepts.project.type" ):</dt>
+                        <dd>$value.projectType.formattedKey</dd>
                         <dt style="color: #707070;">$i18n.getText( "admin.projects.permission.scheme" ):</dt>
                         <dd>$value.permissionScheme.name</dd>
                         <dt style="color: #707070;">$i18n.getText( "admin.projects.notification.scheme" ):</dt>

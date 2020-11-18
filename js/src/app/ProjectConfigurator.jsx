@@ -43,6 +43,7 @@ class ProjectConfigurator extends React.Component {
         projectName: null,
         projectKey: null,
         projectLead: null,
+        projectType: null,
         issueTypes: [],
         workflows: {},
         permissionScheme: null,
@@ -50,6 +51,7 @@ class ProjectConfigurator extends React.Component {
         usersGroups: [],
         usersProjectRoles: {},
         groupsProjectRoles: {},
+        availableProjectTypes: [],
         availableIssueTypes: [],
         availableWorkflows: [],
         availableScreenScheme: [],
@@ -67,6 +69,7 @@ class ProjectConfigurator extends React.Component {
             context: this,
             success: function(data) {
                 this.setState({
+                    availableProjectTypes: data.projectTypes,
                     availableIssueTypes: data.issueTypes,
                     availableWorkflows: data.workflows,
                     availableScreenScheme: data.screenScheme,
@@ -101,6 +104,10 @@ class ProjectConfigurator extends React.Component {
 
     _selectProjectLead = option => {
         this.setState({projectLead: option});
+    };
+
+    _selectProjectType = option => {
+        this.setState({projectType: option});
     };
 
     _selectIssueTypes = options => {
@@ -315,6 +322,7 @@ class ProjectConfigurator extends React.Component {
                 projectName: this.state.projectName,
                 projectKey: this.state.projectKey,
                 projectLeadKey: this.state.projectLead != null ? this.state.projectLead.key : null,
+                projectType: this.state.projectType != null ? this.state.projectType.id : null,
                 processes: this._buildProcess(),
                 permissionSchemeId: this.state.permissionScheme != null ? this.state.permissionScheme.id : null,
                 notificationSchemeId: this.state.notificationScheme != null ? this.state.notificationScheme.id : null,
@@ -378,6 +386,21 @@ class ProjectConfigurator extends React.Component {
                                     getOptionLabel={option => option.displayName}
                                     formatOptionLabel={option => (<AvatarItem avatar={<Avatar src={option.avatarUrl} size="small" />} key={option.key} primaryText={option.displayName} backgroundColor="transparent" />)}
                                     getOptionValue={option => option.key}
+                                    shouldFitContainer
+                                />
+                            </FieldContainer>
+                            <FieldContainer
+                                label={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.type')}
+                                info={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.type.info')}
+                                isInvalid={this.state.errors.hasOwnProperty('projectType')}
+                                invalidMessage={this.state.errors['projectType']}
+                            >
+                                <Select
+                                    options={this.state.availableProjectTypes}
+                                    getOptionLabel={option => option.name}
+                                    getOptionValue={option => option.id}
+                                    onChange={this._selectProjectType}
+                                    placeholder={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.type.select')}
                                     shouldFitContainer
                                 />
                             </FieldContainer>

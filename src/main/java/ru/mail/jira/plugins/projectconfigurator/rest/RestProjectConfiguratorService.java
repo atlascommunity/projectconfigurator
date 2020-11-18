@@ -9,10 +9,15 @@ import com.atlassian.jira.issue.fields.screen.FieldScreenSchemeItem;
 import com.atlassian.jira.issue.fields.screen.FieldScreenTab;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.notification.NotificationScheme;
+import com.atlassian.jira.permission.GlobalPermissionKey;
 import com.atlassian.jira.permission.PermissionScheme;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.project.type.ProjectType;
+import com.atlassian.jira.project.type.ProjectTypeManager;
+import com.atlassian.jira.security.GlobalPermissionManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRole;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.workflow.JiraWorkflow;
 import ru.mail.jira.plugins.commons.RestExecutor;
 import ru.mail.jira.plugins.projectconfigurator.configuration.PluginData;
@@ -32,23 +37,38 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Path("/configuration")
 @Produces({MediaType.APPLICATION_JSON})
 public class RestProjectConfiguratorService {
+    private final GlobalPermissionManager globalPermissionManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final I18nHelper i18nHelper;
     private final ProjectConfiguratorManager projectConfiguratorManager;
+    private final ProjectTypeManager projectTypeManager;
     private final PluginData pluginData;
 
-    public RestProjectConfiguratorService(JiraAuthenticationContext jiraAuthenticationContext, I18nHelper i18nHelper, ProjectConfiguratorManager projectConfiguratorManager, PluginData pluginData) {
+    public RestProjectConfiguratorService(GlobalPermissionManager globalPermissionManager,
+                                          JiraAuthenticationContext jiraAuthenticationContext,
+                                          I18nHelper i18nHelper,
+                                          ProjectConfiguratorManager projectConfiguratorManager,
+                                          ProjectTypeManager projectTypeManager,
+                                          PluginData pluginData) {
+        this.globalPermissionManager = globalPermissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.i18nHelper = i18nHelper;
         this.projectConfiguratorManager = projectConfiguratorManager;
+        this.projectTypeManager = projectTypeManager;
         this.pluginData = pluginData;
+    }
+
+    private boolean isAdministrator(ApplicationUser user) {
+        return user != null && globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user);
     }
 
     @GET
@@ -57,7 +77,11 @@ public class RestProjectConfiguratorService {
         return new RestExecutor<List<UserDto>>() {
             @Override
             protected List<UserDto> doAction() {
-                return projectConfiguratorManager.findUsers(jiraAuthenticationContext.getLoggedInUser(), filter);
+                ApplicationUser currentUser = jiraAuthenticationContext.getLoggedInUser();
+                if (currentUser == null) {
+                    throw new SecurityException();
+                }
+                return projectConfiguratorManager.findUsers(currentUser, filter);
             }
         }.getResponse();
     }
@@ -68,9 +92,14 @@ public class RestProjectConfiguratorService {
         return new RestExecutor<List<Map<String, Object>>>() {
             @Override
             protected List<Map<String, Object>> doAction() {
+                ApplicationUser currentUser = jiraAuthenticationContext.getLoggedInUser();
+                if (currentUser == null) {
+                    throw new SecurityException();
+                }
+
                 List<Map<String, Object>> result = new ArrayList<>();
 
-                List<UserDto> userDtos = projectConfiguratorManager.findUsers(jiraAuthenticationContext.getLoggedInUser(), filter);
+                List<UserDto> userDtos = projectConfiguratorManager.findUsers(currentUser, filter);
                 if (userDtos != null && userDtos.size() > 0) {
                     Map<String, Object> users = new HashMap<>();
                     users.put("label", "Users");
@@ -78,7 +107,7 @@ public class RestProjectConfiguratorService {
                     result.add(users);
                 }
 
-                List<ItemDto> groupDtos = projectConfiguratorManager.findGroups(jiraAuthenticationContext.getLoggedInUser(), filter);
+                List<ItemDto> groupDtos = projectConfiguratorManager.findGroups(currentUser, filter);
                 if (groupDtos != null && groupDtos.size() > 0) {
                     Map<String, Object> groups = new HashMap<>();
                     groups.put("label", "Groups");
@@ -97,7 +126,18 @@ public class RestProjectConfiguratorService {
         return new RestExecutor<Map<String, Object>>() {
             @Override
             protected Map<String, Object> doAction() {
+                ApplicationUser currentUser = jiraAuthenticationContext.getLoggedInUser();
+                if (currentUser == null) {
+                    throw new SecurityException();
+                }
+
                 Map<String, Object> result = new HashMap<>();
+
+                List<ItemDto> projectTypeDtos = new ArrayList<>();
+                for (ProjectType projectType : projectTypeManager.getAllAccessibleProjectTypes()) {
+                    projectTypeDtos.add(new ItemDto(projectType.getKey().getKey(), projectType.getFormattedKey()));
+                }
+                result.put("projectTypes", projectTypeDtos.stream().sorted(Comparator.comparing(ItemDto::getName)).collect(Collectors.toList()));
 
                 List<IssueTypeDto> issueTypeDtos = new ArrayList<>();
                 List<String> issueTypeIds = pluginData.getIssueTypeIds();
@@ -186,6 +226,11 @@ public class RestProjectConfiguratorService {
         return new RestExecutor<Map<String, String>>() {
             @Override
             protected Map<String, String> doAction() throws Exception {
+                ApplicationUser currentUser = jiraAuthenticationContext.getLoggedInUser();
+                if (currentUser == null) {
+                    throw new SecurityException();
+                }
+
                 Map<String, String> result = new HashMap<>();
                 result.put("issueKey", projectConfiguratorManager.createProjectConfigurationTask(projectConfigurationDto));
                 return result;
@@ -199,6 +244,9 @@ public class RestProjectConfiguratorService {
         return new RestExecutor<Map<String, String>>() {
             @Override
             protected Map<String, String> doAction() throws Exception {
+                if (!isAdministrator(jiraAuthenticationContext.getLoggedInUser())) {
+                    throw new SecurityException();
+                }
                 Project project = projectConfiguratorManager.createProjectFromIssue(issueKey);
 
                 Map<String, String> result = new HashMap<>();

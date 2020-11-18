@@ -5,6 +5,8 @@ import com.atlassian.jira.issue.fields.screen.FieldScreenScheme;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.notification.NotificationScheme;
 import com.atlassian.jira.permission.PermissionScheme;
+import com.atlassian.jira.project.type.ProjectType;
+import com.atlassian.jira.project.type.ProjectTypeKeys;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.workflow.JiraWorkflow;
@@ -23,6 +25,7 @@ public class ProjectConfiguration {
     private String projectName;
     private String projectKey;
     private ApplicationUser projectLead;
+    private ProjectType projectType;
     private List<Process> processes;
     private List<Role> roles;
     private PermissionScheme permissionScheme;
@@ -41,6 +44,7 @@ public class ProjectConfiguration {
         result.addProperty("projectName", this.projectName);
         result.addProperty("projectKey", this.projectKey);
         result.addProperty("projectLeadKey", this.projectLead.getKey());
+        result.addProperty("projectType", this.projectType != null ? this.projectType.getKey().getKey() : ProjectTypeKeys.BUSINESS.getKey());
         result.add("processes", processesJsonArray);
         result.add("roles", rolesJsonArray);
         result.addProperty("permissionSchemeId", this.permissionScheme.getId());
