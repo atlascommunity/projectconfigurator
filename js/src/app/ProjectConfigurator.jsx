@@ -333,8 +333,9 @@ class ProjectConfigurator extends React.Component {
                 window.location = `${AJS.contextPath()}/browse/${response.issueKey}`;
             },
             error: function(xhr) {
+                console.log('XHR = ', xhr);
                 try {
-                    const response =  JSON.parse(xhr.responseText);
+                    const response =  JSON.parse(JSON.parse(xhr.responseText).error);
                     if (response.hasOwnProperty('errors')) {
                         this.setState({errors: response.errors});
                     }

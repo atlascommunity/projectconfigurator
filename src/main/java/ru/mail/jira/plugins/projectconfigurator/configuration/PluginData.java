@@ -1,3 +1,4 @@
+/* (C)2020 */
 package ru.mail.jira.plugins.projectconfigurator.configuration;
 
 import java.util.List;

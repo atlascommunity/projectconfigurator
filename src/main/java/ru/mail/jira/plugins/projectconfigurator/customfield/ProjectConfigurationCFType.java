@@ -1,3 +1,4 @@
+/* (C)2020 */
 package ru.mail.jira.plugins.projectconfigurator.customfield;
 
 import com.atlassian.crowd.embedded.api.Group;
@@ -17,6 +18,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -43,15 +45,15 @@ public class ProjectConfigurationCFType extends AbstractSingleFieldType<ProjectC
   private final UserManager userManager;
 
   protected ProjectConfigurationCFType(
-      CustomFieldValuePersister customFieldValuePersister,
-      GenericConfigManager genericConfigManager,
-      GlobalPermissionManager globalPermissionManager,
-      JiraAuthenticationContext jiraAuthenticationContext,
+      @ComponentImport CustomFieldValuePersister customFieldValuePersister,
+      @ComponentImport GenericConfigManager genericConfigManager,
+      @ComponentImport GlobalPermissionManager globalPermissionManager,
+      @ComponentImport JiraAuthenticationContext jiraAuthenticationContext,
       ProjectConfiguratorManager projectConfiguratorManager,
-      ProjectManager projectManager,
-      ProjectRoleManager projectRoleManager,
-      ProjectTypeManager projectTypeManager,
-      UserManager userManager) {
+      @ComponentImport ProjectManager projectManager,
+      @ComponentImport ProjectRoleManager projectRoleManager,
+      @ComponentImport ProjectTypeManager projectTypeManager,
+      @ComponentImport UserManager userManager) {
     super(customFieldValuePersister, genericConfigManager);
     this.globalPermissionManager = globalPermissionManager;
     this.jiraAuthenticationContext = jiraAuthenticationContext;

@@ -1,3 +1,4 @@
+/* (C)2020 */
 package ru.mail.jira.plugins.projectconfigurator.rest.dto;
 
 import java.util.List;

@@ -1,8 +1,12 @@
+/* (C)2020 */
 package ru.mail.jira.plugins.projectconfigurator.configuration;
 
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class PluginDataImpl implements PluginData {
 
   private static final String PLUGIN_PREFIX = "ru.mail.jira.plugins.projectconfigurator:";
@@ -20,7 +24,7 @@ public class PluginDataImpl implements PluginData {
 
   private final PluginSettingsFactory pluginSettingsFactory;
 
-  public PluginDataImpl(PluginSettingsFactory pluginSettingsFactory) {
+  public PluginDataImpl(@ComponentImport PluginSettingsFactory pluginSettingsFactory) {
     this.pluginSettingsFactory = pluginSettingsFactory;
   }
 
