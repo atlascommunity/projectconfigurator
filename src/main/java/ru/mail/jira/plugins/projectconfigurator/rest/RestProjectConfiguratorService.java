@@ -38,7 +38,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import ru.mail.jira.plugins.projectconfigurator.configuration.PluginData;
 import ru.mail.jira.plugins.projectconfigurator.configuration.ProjectConfiguratorManager;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.IssueTypeDto;
@@ -48,9 +47,7 @@ import ru.mail.jira.plugins.projectconfigurator.rest.dto.UserDto;
 
 @Path("/configuration")
 @Produces({MediaType.APPLICATION_JSON})
-@Controller
 public class RestProjectConfiguratorService {
-
   private final GlobalPermissionManager globalPermissionManager;
   private final JiraAuthenticationContext jiraAuthenticationContext;
   private final I18nHelper i18nHelper;
