@@ -1,3 +1,4 @@
+/* (C)2020 */
 package ru.mail.jira.plugins.projectconfigurator.configurator;
 
 import com.atlassian.jira.web.action.JiraWebActionSupport;

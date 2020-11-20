@@ -1,3 +1,4 @@
+/* (C)2020 */
 package ru.mail.jira.plugins.projectconfigurator.configuration;
 
 import com.atlassian.crowd.embedded.api.Group;
@@ -75,6 +76,7 @@ import com.atlassian.jira.workflow.WorkflowManager;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
 import com.atlassian.jira.workflow.migration.AssignableWorkflowSchemeMigrationHelper;
 import com.atlassian.jira.workflow.migration.MigrationHelperFactory;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.UrlMode;
 import java.util.ArrayList;
@@ -87,6 +89,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfiguration;
 import ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfigurationCFType;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.ItemDto;
@@ -95,6 +98,7 @@ import ru.mail.jira.plugins.projectconfigurator.rest.dto.ProjectConfigurationDto
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.RoleDto;
 import ru.mail.jira.plugins.projectconfigurator.rest.dto.UserDto;
 
+@Service
 public class ProjectConfiguratorManager {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectConfiguratorManager.class);
@@ -145,41 +149,41 @@ public class ProjectConfiguratorManager {
       };
 
   public ProjectConfiguratorManager(
-      ApplicationProperties applicationProperties,
-      AvatarService avatarService,
-      CommentManager commentManager,
-      CustomFieldManager customFieldManager,
-      I18nHelper i18nHelper,
-      IssueManager issueManager,
-      IssueService issueService,
-      IssueTypeManager issueTypeManager,
-      IssueTypeSchemeManager issueTypeSchemeManager,
-      IssueTypeScreenSchemeManager issueTypeScreenSchemeManager,
-      FieldConfigSchemeManager fieldConfigSchemeManager,
-      FieldManager fieldManager,
-      FieldScreenFactory fieldScreenFactory,
-      FieldScreenManager fieldScreenManager,
-      FieldScreenService fieldScreenService,
-      GlobalPermissionManager globalPermissionManager,
-      GroupManager groupManager,
-      JiraAuthenticationContext jiraAuthenticationContext,
-      MigrationHelperFactory migrationHelperFactory,
-      NotificationSchemeService notificationSchemeService,
-      PermissionSchemeService permissionSchemeService,
-      FieldScreenSchemeManager fieldScreenSchemeManager,
-      NotificationSchemeManager notificationSchemeManager,
-      PermissionSchemeManager permissionSchemeManager,
+      @ComponentImport ApplicationProperties applicationProperties,
+      @ComponentImport AvatarService avatarService,
+      @ComponentImport CommentManager commentManager,
+      @ComponentImport CustomFieldManager customFieldManager,
+      @ComponentImport I18nHelper i18nHelper,
+      @ComponentImport IssueManager issueManager,
+      @ComponentImport IssueService issueService,
+      @ComponentImport IssueTypeManager issueTypeManager,
+      @ComponentImport IssueTypeSchemeManager issueTypeSchemeManager,
+      @ComponentImport IssueTypeScreenSchemeManager issueTypeScreenSchemeManager,
+      @ComponentImport FieldConfigSchemeManager fieldConfigSchemeManager,
+      @ComponentImport FieldManager fieldManager,
+      @ComponentImport FieldScreenFactory fieldScreenFactory,
+      @ComponentImport FieldScreenManager fieldScreenManager,
+      @ComponentImport FieldScreenService fieldScreenService,
+      @ComponentImport GlobalPermissionManager globalPermissionManager,
+      @ComponentImport GroupManager groupManager,
+      @ComponentImport JiraAuthenticationContext jiraAuthenticationContext,
+      @ComponentImport MigrationHelperFactory migrationHelperFactory,
+      @ComponentImport NotificationSchemeService notificationSchemeService,
+      @ComponentImport PermissionSchemeService permissionSchemeService,
+      @ComponentImport FieldScreenSchemeManager fieldScreenSchemeManager,
+      @ComponentImport NotificationSchemeManager notificationSchemeManager,
+      @ComponentImport PermissionSchemeManager permissionSchemeManager,
       PluginData pluginData,
-      ProjectManager projectManager,
-      ProjectService projectService,
-      ProjectRoleManager projectRoleManager,
-      ProjectRoleService projectRoleService,
-      ProjectTypeManager projectTypeManager,
-      WorkflowManager workflowManager,
-      WorkflowSchemeManager workflowSchemeManager,
-      WorkflowSchemeService workflowSchemeService,
-      UserManager userManager,
-      UserSearchService userSearchService) {
+      @ComponentImport ProjectManager projectManager,
+      @ComponentImport ProjectService projectService,
+      @ComponentImport ProjectRoleManager projectRoleManager,
+      @ComponentImport ProjectRoleService projectRoleService,
+      @ComponentImport ProjectTypeManager projectTypeManager,
+      @ComponentImport WorkflowManager workflowManager,
+      @ComponentImport WorkflowSchemeManager workflowSchemeManager,
+      @ComponentImport WorkflowSchemeService workflowSchemeService,
+      @ComponentImport UserManager userManager,
+      @ComponentImport UserSearchService userSearchService) {
     this.applicationProperties = applicationProperties;
     this.avatarService = avatarService;
     this.commentManager = commentManager;
@@ -944,8 +948,7 @@ public class ProjectConfiguratorManager {
 
     filter = filter.trim().toLowerCase();
     return userSearchService
-        .findUsers(filter, new UserSearchParams(true, true, false, true, null, null))
-        .stream()
+        .findUsers(filter, new UserSearchParams(true, true, false, true, null, null)).stream()
         .limit(10)
         .map(userMapping)
         .collect(Collectors.toList());

@@ -11,118 +11,14 @@
 
     <rest key="rest" path="/projectconfigurator" version="1.0"/>
 
-    <component-import key="plugin-settings-factory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
-    <component key="plugin-data" class="ru.mail.jira.plugins.projectconfigurator.configuration.PluginDataImpl">
-        <interface>ru.mail.jira.plugins.projectconfigurator.configuration.PluginData</interface>
-    </component>
-
-    <component-import key="application-properties" interface="com.atlassian.sal.api.ApplicationProperties" />
-
-    <component key="project-configurator-manager" class="ru.mail.jira.plugins.projectconfigurator.configuration.ProjectConfiguratorManager" />
-
-    <web-resource key="project-configurator-soy-templates">
-        <dependency>com.atlassian.soy.soy-template-plugin:soy-deps</dependency>
-        <transformation extension="soy">
-            <transformer key="soyTransformer"/>
-        </transformation>
-        <resource type="download" name="templates.soy.js" location="ru/mail/jira/plugins/projectconfigurator/templates.soy"/>
-    </web-resource>
-    
-    <web-resource key="project-configurator-configuration-resources" name="Project Configurator Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
-        <dependency>ru.mail.jira.plugins.projectconfigurator:project-configurator-soy-templates</dependency>
-
-        <resource type="download" name="project-configurator-configuration.js" location="ru/mail/jira/plugins/projectconfigurator/configuration/project-configurator-configuration.js" />
-    </web-resource>
-
-    <web-resource key="project-configurator-i18n-resource">
-        <transformation extension="js">
-            <transformer key="jsI18n"/>
-        </transformation>
-        <resource type="download" name="project-configurator-i18n.js" location="ru/mail/jira/plugins/projectconfigurator/i18n/project-configurator-i18n.js" />
-    </web-resource>
-
-    <web-resource key="project-configurator-bundle-resource">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <dependency>com.atlassian.jira.plugins.jira-workflow-designer:workflow-designer-read-only</dependency>
-        <dependency>ru.mail.jira.plugins.projectconfigurator:project-configurator-i18n-resource</dependency>
-        <resource type="download" name="projectConfigurator.js" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/projectConfigurator.js" />
-        <resource type="download" name="projectConfigurator.css" location="ru/mail/jira/plugins/projectconfigurator/configurator/react/projectConfigurator.css" />
-    </web-resource>
-
-    <webwork1 key="project-configurator-configuration" class="java.lang.Object" roles-required="admin">
-        <actions>
-            <action name="ru.mail.jira.plugins.projectconfigurator.configuration.ProjectConfiguratorConfiguration" alias="ProjectConfiguratorConfiguration">
-                <view name="success">/ru/mail/jira/plugins/projectconfigurator/configuration/project-configurator-configuration.vm</view>
-            </action>
-        </actions>
-    </webwork1>
-
-    <webwork1 key="project-configurator-configuration-actions" class="java.lang.Object" roles-required="admin">
-        <actions>
-            <action name="ru.mail.jira.plugins.projectconfigurator.configuration.ProjectConfiguratorConfigurationEdit" alias="ProjectConfiguratorConfigurationEdit">
-                <view name="input">/ru/mail/jira/plugins/projectconfigurator/configuration/project-configurator-configuration-edit.vm</view>
-            </action>
-            <action name="ru.mail.jira.plugins.projectconfigurator.configuration.ProjectConfiguratorConfigurationDelete" alias="ProjectConfiguratorConfigurationDelete">
-                <view name="input">/ru/mail/jira/plugins/projectconfigurator/configuration/project-configurator-configuration-delete.vm</view>
-            </action>
-        </actions>
-    </webwork1>
-
-    <webwork1 key="project-configurator-action" class="java.lang.Object" roles-required="admin">
-        <actions>
-            <action name="ru.mail.jira.plugins.projectconfigurator.configurator.ProjectConfigurator" alias="ProjectConfigurator">
-                <view name="success">/ru/mail/jira/plugins/projectconfigurator/configurator/project-configurator-page.vm</view>
-                <view name="securitybreach">/secure/views/securitybreach.jsp</view>
-            </action>
-        </actions>
-    </webwork1>
-
     <sitemesh key="project-configurator-sitemesh-prettyurls" path="/projectConfigurator"/>
     <routing key="project-configurator-prettyurls" path="/projectConfigurator">
         <route from="" to="/secure/ProjectConfigurator.jspa"/>
     </routing>
-
-    <web-section key="project-configurator-configuration-section" location="admin_project_menu">
-        <label key="ru.mail.jira.plugins.projectconfigurator" />
-        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
-            <param name="permission">admin</param>
-        </condition>
-    </web-section>
-
-    <web-item key="project-configurator-configuration-link" section="admin_project_menu/project-configurator-configuration-section">
-        <label key="ru.mail.jira.plugins.projectconfigurator.configuration" />
-        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
-            <param name="permission">admin</param>
-        </condition>
-        <link linkId="project-configurator-configuration-link">/secure/admin/ProjectConfiguratorConfiguration.jspa</link>
-    </web-item>
-
-    <web-resource key="project-configuration-field-resource">
-        <transformation extension="js">
-            <transformer key="jsI18n"/>
-        </transformation>
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <dependency>com.atlassian.auiplugin:aui-flag</dependency>
-        <resource type="download" name="project-configuration-field.css" location="/ru/mail/jira/plugins/projectconfigurator/customfield/project-configuration-field.css" />
-        <resource type="download" name="project-configuration-field.js" location="/ru/mail/jira/plugins/projectconfigurator/customfield/project-configuration-field.js" />
-        <context>atl.general</context>
-    </web-resource>
 
     <customfield-type key="project-configuration-field" i18n-name-key="ru.mail.jira.plugins.projectconfigurator.field" class="ru.mail.jira.plugins.projectconfigurator.customfield.ProjectConfigurationCFType">
         <description key="ru.mail.jira.plugins.projectconfigurator.field.description" />
         <resource type="velocity" name="view" location="/ru/mail/jira/plugins/projectconfigurator/customfield/project-configuration-field-view.vm" />
     </customfield-type>
 
-    <web-item key="project-configuration-menu-link" name="Project Configuration Link" section="system.top.navigation.bar" weight="200">
-        <conditions type="AND">
-            <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
-            <condition class="ru.mail.jira.plugins.projectconfigurator.configurator.ProjectConfiguratorCondition" />
-        </conditions>
-        <label key="ru.mail.jira.plugins.projectconfigurator"/>
-        <tooltip key="ru.mail.jira.plugins.projectconfigurator"/>
-        <link linkId="project-configurator-link">/projectConfigurator</link>
-    </web-item>
-    
 </atlassian-plugin>

@@ -1,3 +1,4 @@
+/* (C)2020 */
 package ru.mail.jira.plugins.projectconfigurator.customfield;
 
 import com.atlassian.crowd.embedded.api.Group;
