@@ -30,8 +30,12 @@ class ScreenSchemesDialog extends React.Component {
             {
                 text: i18n.getText('common.words.select'),
                 onClick: () => {
-                    this.props.addScreenScheme(issueType, selectedScreenScheme);
-                    onClose();
+                    if (selectedScreenScheme == null) {
+                        onClose();
+                    } else {
+                        this.props.addScreenScheme(issueType, selectedScreenScheme);
+                        onClose();
+                    }
                 },
             },
             {
