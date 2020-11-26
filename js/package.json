@@ -23,7 +23,7 @@
     "style-loader": "^0.20.1",
     "url-loader": "^0.6.2",
     "webpack": "^3.11.0",
-    "webpack-bundle-analyzer": "^2.10.0"
+    "webpack-bundle-analyzer": "^3.3.2"
   },
   "scripts": {
     "build": "NODE_ENV=development webpack --progress --config config/webpack.config.js",
