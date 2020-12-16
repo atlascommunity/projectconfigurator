@@ -9,7 +9,7 @@ import {connect} from 'react-redux';
 import memoize from 'lodash.memoize';
 
 import Page from '@atlaskit/page';
-import TextField from '@atlaskit/field-text';
+import TextField, {FieldTextStateless} from '@atlaskit/field-text';
 import Select, {AsyncSelect, CheckboxSelect} from '@atlaskit/select';
 import Avatar, { AvatarItem } from '@atlaskit/avatar';
 import QuestionCircleIcon from '@atlaskit/icon/glyph/question-circle';
@@ -99,7 +99,7 @@ class ProjectConfigurator extends React.Component {
     };
 
     _selectProjectKey = event => {
-        this.setState({projectKey: event.target.value});
+        this.setState({projectKey: event.target.value.toUpperCase()});
     };
 
     _selectProjectLead = option => {
@@ -363,14 +363,14 @@ class ProjectConfigurator extends React.Component {
                                 isInvalid={this.state.errors.hasOwnProperty('projectName')}
                                 invalidMessage={this.state.errors['projectName']}
                             >
-                                <TextField label={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.name')} shouldFitContainer maxLength={80} onChange={this._selectProjectName} />
+                                <TextField label={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.name')} shouldFitContainer maxLength={80} onChange={this._selectProjectName}  />
                             </FieldContainer>
                             <FieldContainer
                                 info={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.key.info')}
                                 isInvalid={this.state.errors.hasOwnProperty('projectKey')}
                                 invalidMessage={this.state.errors['projectKey']}
                             >
-                                <TextField label={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.key')} shouldFitContainer maxLength={10} onChange={this._selectProjectKey} />
+                                <FieldTextStateless label={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.key')} shouldFitContainer maxLength={10} onChange={this._selectProjectKey} value={this.state.projectKey}/>
                             </FieldContainer>
                             <FieldContainer
                                 label={i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.project.lead')}
