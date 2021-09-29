@@ -40,10 +40,7 @@ import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.mail.jira.plugins.projectconfigurator.configuration.PluginData;
 import ru.mail.jira.plugins.projectconfigurator.configuration.ProjectConfiguratorManager;
-import ru.mail.jira.plugins.projectconfigurator.rest.dto.IssueTypeDto;
-import ru.mail.jira.plugins.projectconfigurator.rest.dto.ItemDto;
-import ru.mail.jira.plugins.projectconfigurator.rest.dto.ProjectConfigurationDto;
-import ru.mail.jira.plugins.projectconfigurator.rest.dto.UserDto;
+import ru.mail.jira.plugins.projectconfigurator.rest.dto.*;
 
 @Path("/configuration")
 @Produces({MediaType.APPLICATION_JSON})
@@ -147,14 +144,16 @@ public class RestProjectConfiguratorService {
     }
     result.put("issueTypes", issueTypeDtos);
 
-    List<ItemDto> workflowDto = new ArrayList<>();
+    List<WorkflowDto> workflowDto = new ArrayList<>();
     List<String> workflowNames = pluginData.getWorkflowNames();
     if (workflowNames != null) {
       for (String workflowName : workflowNames) {
         JiraWorkflow workflow = projectConfiguratorManager.getWorkflow(workflowName);
         workflowDto.add(
-            new ItemDto(
-                String.valueOf(workflow.getDescriptor().getEntityId()), workflow.getName()));
+            new WorkflowDto(
+                String.valueOf(workflow.getDescriptor().getEntityId()),
+                workflow.getName(),
+                workflow.isActive()));
       }
     }
     result.put("workflows", workflowDto);
