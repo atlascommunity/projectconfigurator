@@ -44,7 +44,7 @@ class WorkflowInfoDialog extends React.Component {
         ];
 
         return (
-            workflow.isActive?
+            workflow.active?
             <Modal
                 heading={workflow.name}
                 scrollBehavior="outside"

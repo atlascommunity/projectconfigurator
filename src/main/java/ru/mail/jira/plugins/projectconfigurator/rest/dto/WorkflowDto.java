@@ -14,11 +14,11 @@ public class WorkflowDto {
 
   @XmlElement String id;
   @XmlElement String name;
-  @XmlElement boolean isActive;
+  @XmlElement boolean active;
 
-  public WorkflowDto(String id, String name, boolean isActive) {
+  public WorkflowDto(String id, String name, boolean active) {
     this.id = id;
     this.name = name;
-    this.isActive = isActive;
+    this.active = active;
   }
 }

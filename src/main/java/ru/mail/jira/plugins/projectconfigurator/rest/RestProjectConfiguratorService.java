@@ -153,7 +153,7 @@ public class RestProjectConfiguratorService {
             new WorkflowDto(
                 String.valueOf(workflow.getDescriptor().getEntityId()),
                 workflow.getName(),
-                workflow.isActive()));
+                workflow.isActive() && isAdministrator(currentUser)));
       }
     }
     result.put("workflows", workflowDto);
