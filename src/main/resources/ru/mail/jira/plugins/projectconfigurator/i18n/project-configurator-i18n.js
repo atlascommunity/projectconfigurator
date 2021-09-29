@@ -60,6 +60,7 @@ define('project-configurator/i18n', function () {
 		'ru.mail.jira.plugins.projectconfigurator.page.workflow.error.description': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.workflow.error.description'),
 		'ru.mail.jira.plugins.projectconfigurator.page.workflow.delete': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.workflow.delete'),
 		'ru.mail.jira.plugins.projectconfigurator.page.workflow.add': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.workflow.add'),
+		'ru.mail.jira.plugins.projectconfigurator.page.workflow.inactive': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.workflow.inactive'),
 		'ru.mail.jira.plugins.projectconfigurator.page.screenSchemes': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.screenSchemes'),
 		'ru.mail.jira.plugins.projectconfigurator.page.screenSchemes.select': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.screenSchemes.select'),
 		'ru.mail.jira.plugins.projectconfigurator.page.screenSchemes.select.issueType': AJS.I18n.getText('ru.mail.jira.plugins.projectconfigurator.page.screenSchemes.select.issueType'),

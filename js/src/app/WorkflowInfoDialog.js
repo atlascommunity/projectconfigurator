@@ -44,6 +44,7 @@ class WorkflowInfoDialog extends React.Component {
         ];
 
         return (
+            workflow.isActive?
             <Modal
                 heading={workflow.name}
                 scrollBehavior="outside"
@@ -54,6 +55,14 @@ class WorkflowInfoDialog extends React.Component {
                 width="large"
             >
                 <div id={`workflow-${workflow.id}-info`} className="flex-column full-width" />
+            </Modal>:
+            <Modal
+                heading={workflow.name}
+                actions={actions}
+                onClose={onClose}
+                width="large"
+            >
+                <div>{i18n.getText('ru.mail.jira.plugins.projectconfigurator.page.workflow.inactive')}</div>
             </Modal>
         );
     }
