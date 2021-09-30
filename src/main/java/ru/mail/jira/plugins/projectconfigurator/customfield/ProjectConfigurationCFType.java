@@ -114,11 +114,11 @@ public class ProjectConfigurationCFType extends AbstractSingleFieldType<ProjectC
       }
 
       JsonObject jsonProjectConfiguration = new JsonParser().parse(strValue).getAsJsonObject();
-      List<ProjectConfiguration.Process> processes = new ArrayList<>();
+      List<ProjectConfiguration.JiraProcess> processes = new ArrayList<>();
       for (JsonElement processElement : jsonProjectConfiguration.getAsJsonArray("processes")) {
         JsonObject processObject = processElement.getAsJsonObject();
 
-        ProjectConfiguration.Process role = new ProjectConfiguration().new Process();
+        ProjectConfiguration.JiraProcess role = new ProjectConfiguration.JiraProcess();
         role.setIssueType(
             projectConfiguratorManager.getIssueType(
                 processObject.getAsJsonPrimitive("issueTypeId").getAsString()));
@@ -149,7 +149,7 @@ public class ProjectConfigurationCFType extends AbstractSingleFieldType<ProjectC
           }
         }
 
-        ProjectConfiguration.Role role = new ProjectConfiguration().new Role();
+        ProjectConfiguration.Role role = new ProjectConfiguration.Role();
         role.setProjectRole(
             projectRoleManager.getProjectRole(
                 roleObject.getAsJsonPrimitive("projectRoleId").getAsLong()));

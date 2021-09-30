@@ -1,0 +1,225 @@
+openapi: 3.0.1
+info:
+  description: todo
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: "Mail.ru Plugin: Project Configurator"
+  version: 2.0.2
+servers:
+- description: Plugin Endpoint URL
+  url: https://jira.mail.ru/rest/projectconfigurator/1.0
+paths:
+  /admin/user:
+    get:
+      operationId: getList
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: filter
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataListDTOUserDto'
+          description: default response
+  /admin/user/many:
+    get:
+      operationId: getMany
+      parameters:
+      - in: query
+        name: "ids[]"
+        schema:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataListDTOUserDto'
+          description: default response
+  /admin/user/{userKey}:
+    get:
+      operationId: getOne
+      parameters:
+      - in: path
+        name: userKey
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataDTOUserDto'
+          description: default response
+  /configuration:
+    post:
+      operationId: createConfiguration
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ProjectConfigurationDto'
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+  /configuration/createProject/{issueKey}:
+    get:
+      operationId: creteProject
+      parameters:
+      - in: path
+        name: issueKey
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+  /configuration/data:
+    get:
+      operationId: getConfigurationData
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+  /configuration/findUsers:
+    get:
+      operationId: findUsers
+      parameters:
+      - in: query
+        name: filter
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+  /configuration/findUsersGroups:
+    get:
+      operationId: findUsersGroups
+      parameters:
+      - in: query
+        name: filter
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+components:
+  schemas:
+    DataDTOUserDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UserDto'
+        validUntil:
+          type: string
+          format: date-time
+    DataListDTOUserDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDto'
+        total:
+          type: integer
+          format: int32
+        validUntil:
+          type: string
+          format: date-time
+    ProcessDto:
+      type: object
+      properties:
+        issueTypeId:
+          type: string
+        screenSchemeId:
+          type: integer
+          format: int64
+        workflowName:
+          type: string
+    ProjectConfigurationDto:
+      type: object
+      properties:
+        notificationSchemeId:
+          type: integer
+          format: int64
+        permissionSchemeId:
+          type: integer
+          format: int64
+        processes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProcessDto'
+        projectKey:
+          type: string
+        projectLeadKey:
+          type: string
+        projectName:
+          type: string
+        projectType:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleDto'
+    RoleDto:
+      type: object
+      properties:
+        groupNames:
+          type: array
+          items:
+            type: string
+        projectRoleId:
+          type: integer
+          format: int64
+        userKeys:
+          type: array
+          items:
+            type: string
+    UserDto:
+      type: object
+      properties:
+        avatarUrl:
+          type: string
+        displayName:
+          type: string
+        displayNameWithEmail:
+          type: string
+        email:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        profileUrl:
+          type: string
+        type:
+          type: string
+        userKey:
+          type: string

@@ -27,14 +27,15 @@ public class ProjectConfiguration {
   private String projectKey;
   private ApplicationUser projectLead;
   private ProjectType projectType;
-  private List<Process> processes;
+  private List<JiraProcess> processes;
   private List<Role> roles;
   private PermissionScheme permissionScheme;
   private NotificationScheme notificationScheme;
 
+  @Override
   public String toString() {
     JsonArray processesJsonArray = new JsonArray();
-    for (Process process : processes) {
+    for (JiraProcess process : processes) {
       processesJsonArray.add(process.toJson());
     }
 
@@ -61,13 +62,13 @@ public class ProjectConfiguration {
 
   @Getter
   @Setter
-  public class Process {
+  public static class JiraProcess {
 
     private IssueType issueType;
     private JiraWorkflow jiraWorkflow;
     private FieldScreenScheme fieldScreenScheme;
 
-    public Process() {}
+    public JiraProcess() {}
 
     private JsonObject toJson() {
       JsonObject result = new JsonObject();
@@ -77,6 +78,7 @@ public class ProjectConfiguration {
       return result;
     }
 
+    @Override
     public String toString() {
       return toJson().toString();
     }
@@ -84,7 +86,7 @@ public class ProjectConfiguration {
 
   @Getter
   @Setter
-  public class Role {
+  public static class Role {
 
     private ProjectRole projectRole;
     private Collection<ApplicationUser> users;
@@ -114,6 +116,7 @@ public class ProjectConfiguration {
       return result;
     }
 
+    @Override
     public String toString() {
       return toJson().toString();
     }

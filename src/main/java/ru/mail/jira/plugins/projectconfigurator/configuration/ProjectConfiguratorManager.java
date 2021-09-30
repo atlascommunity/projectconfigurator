@@ -83,7 +83,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -138,15 +137,6 @@ public class ProjectConfiguratorManager {
   private final WorkflowSchemeService workflowSchemeService;
   private final UserManager userManager;
   private final UserSearchService userSearchService;
-  private final Function<ApplicationUser, UserDto> userMapping =
-      (user) -> {
-        UserDto userDto = new UserDto();
-        userDto.setKey(user.getKey());
-        userDto.setName(user.getName());
-        userDto.setDisplayName(user.getDisplayName());
-        userDto.setAvatarUrl(getAvatar(user, Avatar.Size.LARGE));
-        return userDto;
-      };
 
   public ProjectConfiguratorManager(
       @ComponentImport ApplicationProperties applicationProperties,
@@ -237,6 +227,7 @@ public class ProjectConfiguratorManager {
       }
       result.put("errors", errorsObject);
     } catch (Exception ignore) {
+      // ignore exception
     }
 
     return result;
@@ -496,7 +487,7 @@ public class ProjectConfiguratorManager {
   }
 
   private IssueTypeScreenScheme createIssueTypeScreenScheme(
-      String projectKey, List<ProjectConfiguration.Process> processes) throws Exception {
+      String projectKey, List<ProjectConfiguration.JiraProcess> processes) throws Exception {
     final IssueTypeScreenScheme issueTypeScreenScheme =
         fieldScreenFactory.createIssueTypeScreenScheme();
     issueTypeScreenScheme.setName(String.format("%s Issue Types Screen Scheme", projectKey));
@@ -509,7 +500,7 @@ public class ProjectConfiguratorManager {
             null,
             fieldScreenSchemeManager.getFieldScreenScheme(
                 FieldScreenSchemeManager.DEFAULT_FIELD_SCREEN_SCHEME_ID)));
-    for (ProjectConfiguration.Process process : processes) {
+    for (ProjectConfiguration.JiraProcess process : processes) {
       IssueType issueType = process.getIssueType();
       FieldScreenScheme copiedScreenScheme =
           copyFieldScreenScheme(projectKey, issueType.getName(), process.getFieldScreenScheme());
@@ -525,11 +516,11 @@ public class ProjectConfiguratorManager {
   }
 
   private AssignableWorkflowScheme createWorkflowScheme(
-      String projectKey, List<ProjectConfiguration.Process> processes) throws Exception {
+      String projectKey, List<ProjectConfiguration.JiraProcess> processes) throws Exception {
     AssignableWorkflowScheme.Builder assignableWorkflowSchemeBuilder =
         workflowSchemeManager.assignableBuilder();
     assignableWorkflowSchemeBuilder.setName(String.format("%s Workflow Scheme", projectKey));
-    for (ProjectConfiguration.Process process : processes) {
+    for (ProjectConfiguration.JiraProcess process : processes) {
       IssueType issueType = process.getIssueType();
       JiraWorkflow workflow = process.getJiraWorkflow();
       JiraWorkflow copyWorkflow =
@@ -799,9 +790,9 @@ public class ProjectConfiguratorManager {
       return null;
     }
 
-    List<ProjectConfiguration.Process> processes = new ArrayList<>();
+    List<ProjectConfiguration.JiraProcess> processes = new ArrayList<>();
     for (ProcessDto processDto : projectConfigurationDto.getProcesses()) {
-      ProjectConfiguration.Process role = new ProjectConfiguration().new Process();
+      ProjectConfiguration.JiraProcess role = new ProjectConfiguration.JiraProcess();
       role.setIssueType(getIssueType(processDto.getIssueTypeId()));
       role.setJiraWorkflow(getWorkflow(processDto.getWorkflowName()));
       role.setFieldScreenScheme(getFieldScreenScheme(processDto.getScreenSchemeId()));
@@ -819,7 +810,7 @@ public class ProjectConfiguratorManager {
         groups.add(getGroup(groupName));
       }
 
-      ProjectConfiguration.Role role = new ProjectConfiguration().new Role();
+      ProjectConfiguration.Role role = new ProjectConfiguration.Role();
       role.setProjectRole(projectRoleManager.getProjectRole(roleDto.getProjectRoleId()));
       role.setUsers(users);
       role.setGroups(groups);
@@ -842,7 +833,7 @@ public class ProjectConfiguratorManager {
   private Project createProject(ProjectConfiguration projectConfiguration) throws Exception {
     List<IssueType> issueTypes =
         projectConfiguration.getProcesses().stream()
-            .map(ProjectConfiguration.Process::getIssueType)
+            .map(ProjectConfiguration.JiraProcess::getIssueType)
             .collect(Collectors.toList());
     String projectKey = projectConfiguration.getProjectKey();
 
@@ -950,7 +941,15 @@ public class ProjectConfiguratorManager {
     return userSearchService
         .findUsers(filter, new UserSearchParams(true, true, false, true, null, null)).stream()
         .limit(10)
-        .map(userMapping)
+        .map(
+            (u) -> {
+              UserDto userDto = new UserDto();
+              userDto.setKey(u.getKey());
+              userDto.setName(u.getName());
+              userDto.setDisplayName(u.getDisplayName());
+              userDto.setAvatarUrl(getAvatar(u, Avatar.Size.LARGE));
+              return userDto;
+            })
         .collect(Collectors.toList());
   }
 
