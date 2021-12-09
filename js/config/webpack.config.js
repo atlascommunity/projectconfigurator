@@ -231,13 +231,13 @@ module.exports = {
         new webpack.DefinePlugin(env.stringified),
         // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
         extractLess,
-        new CleanWebpackPlugin(
-            cssDir + "*.*",
-            {
-                dry: false,
-                allowExternal: true
-            }
-        ),
+        // new CleanWebpackPlugin(
+        //     cssDir + "*.*",
+        //     {
+        //         dry: false,
+        //         allowExternal: true
+        //     }
+        // ),
         // Moment.js is an extremely popular library that bundles large locale files
         // by default due to how Webpack interprets its code. This is a practical
         // solution that requires the user to opt into importing specific locales.
